@@ -1,0 +1,23 @@
+package com.sip.book_shop.repository;
+
+import com.sip.book_shop.model.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Integer> {
+
+    List<Book> findByAuthorId(int authorId);
+
+    @Query("select b from Book b where " +
+            "lower(b.title) like lower(concat('%', :searchValue, '%')) or " +
+            "lower(b.author.name) like lower(concat('%', :searchValue, '%')) or " +
+            "lower(b.category.name) like lower(concat('%', :searchValue, '%'))")
+    Page<Book> searchByKeyword(@Param("searchValue") String searchValue, Pageable pageable);
+}

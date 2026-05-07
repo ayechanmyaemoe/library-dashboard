@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head(~{this :: title})">
+  <title>Book List</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <script th:src="@{/js/jquery.min.js}"></script>
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
+  <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
+
+  <script th:src="@{/js/bootstrap.min.js}"></script>
+  <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+  <link th:href="@{/css/core.css}" rel="stylesheet" />
+</head>
+<body>
+
+  <header th:insert="layout :: header"></header>
+
+  <div class="container">
+    <div th:replace="layout :: pageTitle('All Books in one place!')"></div>
+
+    <div th:insert="layout :: content(~{ :: #book-list})">
+      <div id="book-list">
+        <a th:href="@{/books/add}">
+          <button type="button" class="btn btn-info" style="margin-bottom: 10px;">Create New</button>
+        </a>
+        <table id="myDataTable" class="display">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Published Year</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <footer th:replace="layout :: footer">Footer</footer>
+</body>
+
+<script>
+  $(document).ready(function() {
+    $('#myDataTable').DataTable({
+      serverSide: true,
+      processing: true,
+      searching: true,
+      ordering: true,
+      order: [ [0, 'desc'] ],
+      ajax: {
+        url: "/api/books",
+        type: "GET"
+      },
+      columns: [
+        { data: "id" },
+        { data: "title" },
+        { data: "author.name" },
+        { data: "category.name", defaultContent: "" },
+        { data: "publishedYear" },
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          render: function (data, type, row) {
+            return renderActions('book', row.id);
+          }
+        }
+      ]
+    });
+  });
+</script>
+
+<div th:replace="~{layout :: action}"></div>
+</html>

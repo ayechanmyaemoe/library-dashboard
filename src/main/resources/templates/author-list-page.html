@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head(~{this :: title})">
+    <title>Author List</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script th:src="@{/js/jquery.min.js}"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
+    <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
+
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/core.css}" rel="stylesheet" />
+</head>
+<body>
+
+    <header th:insert="layout :: header"></header>
+
+    <div class="container">
+        <div th:replace="layout :: pageTitle('All Authors in one place!')"></div>
+
+        <div th:insert="layout :: content(~{ :: #author-list})">
+            <div id="author-list">
+                <a th:href="@{/authors/add}">
+                    <button type="button" class="btn btn-info" style="margin-bottom: 10px;">Create New</button>
+                </a>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}">Error message here</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <table id="myDataTable" class="display">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Birth Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="layout :: footer">Footer</footer>
+</body>
+
+<script>
+    $(document).ready(function() {
+        $('#myDataTable').DataTable({
+            serverSide: true,
+            processing: true,
+            searching: true,
+            ordering: true,
+            order: [ [0, 'desc'] ],
+            ajax: {
+                url: "/api/authors",
+                type: "GET"
+            },
+            columns: [
+                { data: "id" },
+                { data: "name" },
+                { data: "birthDate" },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return renderActions('author', row.id);
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+<div th:replace="~{layout :: action}"></div>
+</html>
