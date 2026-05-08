@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head(title)">
-
   <th:block th:replace="${title}"></th:block>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-  <script th:src="@{/js/jquery.min.js}"></script>
+  <script th:src="@{/webjars/jquery/1.11.1/jquery.min.js}"></script>
 
   <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
   <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
 
-  <script th:src="@{/js/bootstrap.min.js}"></script>
-  <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+  <script th:src="@{/webjars/bootstrap/3.0.0/js/bootstrap.bundle.min.js}"></script>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.0.0/css/bootstrap.min.css}">
   <link th:href="@{/css/core.css}" rel="stylesheet" />
-
 </head>
 <body>
 
