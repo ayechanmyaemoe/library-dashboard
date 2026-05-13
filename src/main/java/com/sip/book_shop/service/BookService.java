@@ -17,6 +17,10 @@ public class BookService {
         bookRepository.save(book);
     }
 
+    public int countAllBooks() {
+        return bookRepository.findAll().size();
+    }
+
     public Book getBookById(int id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("There is no book with such id."));
@@ -25,7 +29,7 @@ public class BookService {
     public void deleteBookById(int id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("There is no book with such id"));
-        bookRepository.deleteById(book.id);
+        bookRepository.deleteById(book.getId());
     }
 
     public Page<Book> findPaginated(Pageable pageable) {

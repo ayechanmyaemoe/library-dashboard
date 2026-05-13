@@ -1,6 +1,7 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.BookDto;
+import com.sip.book_shop.mapper.BookMapper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.Category;
@@ -29,13 +30,17 @@ public class BookController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private BookMapper bookMapper;
+
     @GetMapping("/")
     public String index() {
         return "redirect:/books";
     }
 
     @GetMapping
-    public String getAllBooks() {
+    public String getAllBooks(Model model) {
+        model.addAttribute("module", "books");
         return "book-list-page";
     }
 
@@ -69,12 +74,9 @@ public class BookController {
         if(bookDto.getId() != null) {
             book = bookService.getBookById(bookDto.getId());
         } else {
-            book = new Book();
+            book = bookMapper.toEntity(bookDto);
         }
-        book.setTitle(bookDto.getTitle().trim());
         book.setPublishedYear(Integer.parseInt(bookDto.getPublishedYear()));
-        book.setAuthor(bookDto.getAuthor());
-        book.setCategory(bookDto.getCategory());
         bookService.saveBook(book);
         return "redirect:/books";
     }

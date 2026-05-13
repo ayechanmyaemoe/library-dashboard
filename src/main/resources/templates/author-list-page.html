@@ -57,7 +57,12 @@
             columns: [
                 { data: "id" },
                 { data: "name" },
-                { data: "birthDate" },
+                {
+                    data: "birthDate",
+                    render: function (data) {
+                        return data ? moment(data).format('DD-MM-YYYY') : '';
+                    }
+                },
                 {
                     data: null,
                     orderable: false,

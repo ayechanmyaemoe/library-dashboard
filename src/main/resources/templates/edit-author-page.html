@@ -26,7 +26,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Birth Year:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{birthDate}"
+                    <input class="form-control" type="date" th:field="*{birthDate}"
                            th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">
                         BirthYear Error

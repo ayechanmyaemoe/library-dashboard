@@ -1,6 +1,7 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.AuthorDto;
+import com.sip.book_shop.mapper.AuthorMapper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.service.AuthorService;
 import jakarta.validation.Valid;
@@ -18,13 +19,17 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
 
+    @Autowired
+    private AuthorMapper authorMapper;
+
     @GetMapping("/")
     public String index() {
         return "redirect:/authors";
     }
 
     @GetMapping
-    public String getAllBooks() {
+    public String getAllBooks(Model model) {
+        model.addAttribute("module", "authors");
         return "author-list-page";
     }
 
@@ -48,10 +53,8 @@ public class AuthorController {
         if(authorDto.getId() != null) {
             author = authorService.getAuthorById(authorDto.getId());
         } else {
-            author = new Author();
+            author = authorMapper.toEntity(authorDto);
         }
-        author.setName(authorDto.getName().trim());
-        author.setBirthDate(authorDto.getBirthDate());
         authorService.saveAuthor(author);
         return "redirect:/authors";
     }

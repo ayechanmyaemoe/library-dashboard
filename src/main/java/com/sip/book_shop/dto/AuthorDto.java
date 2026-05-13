@@ -22,7 +22,7 @@ public class AuthorDto {
     @NotBlank(message = "This cannot be blank!", groups = BlankCheck.class)
     public String name;
 
-    @NotNull(message = "This cannot be blank!", groups = BlankCheck.class)
+    @NotNull(message = "This is required to insert!", groups = BlankCheck.class)
     @Past(message = "Birth date must be in the past!", groups = BirthDateValidCheck.class)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     public LocalDate birthDate;

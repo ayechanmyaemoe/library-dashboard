@@ -28,6 +28,10 @@ public class AuthorService {
         authorRepository.save(author);
     }
 
+    public int countAllAuthors() {
+        return authorRepository.findAll().size();
+    }
+
     public Author getAuthorById(int id) {
         return authorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("There is no author with such id."));
