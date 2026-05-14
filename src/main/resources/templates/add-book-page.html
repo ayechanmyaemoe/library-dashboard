@@ -9,7 +9,7 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Add New Book')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${book}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${bookDto}" method="post">
 
             <div class="form-group">
                 <label class="col-lg-4 control-label">Title:</label>

@@ -57,4 +57,8 @@ public class AuthorService {
     public Page<Author> searchAuthors(String searchValue, Pageable pageable) {
         return authorRepository.searchByKeyword(searchValue, pageable);
     }
+
+    public Author findByName(String name) {
+        return authorRepository.findByName(name);
+    }
 }

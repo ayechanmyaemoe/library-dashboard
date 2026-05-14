@@ -1,12 +1,8 @@
 package com.sip.book_shop.controller.api;
 
-import com.sip.book_shop.model.Author;
-import com.sip.book_shop.model.Book;
-import com.sip.book_shop.model.User;
+import com.sip.book_shop.model.*;
 import com.sip.book_shop.model.base.BaseEntity;
-import com.sip.book_shop.service.AuthorService;
-import com.sip.book_shop.service.BookService;
-import com.sip.book_shop.service.UserService;
+import com.sip.book_shop.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +29,12 @@ public class ApiController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping("/books")
     public Map<String, Object> getAllBookData(@RequestParam int draw,
@@ -127,6 +129,70 @@ public class ApiController {
                 currentPage,
                 pageUsers.getTotalPages(),
                 pageUsers.getNumberOfElements()
+        );
+    }
+
+    @GetMapping("/categories")
+    public Map<String, Object> getAllCategoryData(@RequestParam int draw,
+                                              @RequestParam int start,
+                                              @RequestParam int length,
+                                              @RequestParam(value = "search[value]", required = false) String searchValue,
+                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+        Page<Category> pageCategories;
+
+        String[] columnNames = {"id", "name"};
+        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+
+        if (searchValue != null && !searchValue.isEmpty()) {
+            pageCategories = categoryService.searchCategories(searchValue, pageable);
+        } else {
+            pageCategories = categoryService.findPaginated(pageable);
+        }
+
+        int totalCount = categoryService.countAllCategories();
+        int currentPage = pageCategories.getNumber() + 1;
+
+        return getResponse(
+                draw,
+                totalCount,
+                pageCategories.getTotalElements(),
+                pageCategories.getContent(),
+                currentPage,
+                pageCategories.getTotalPages(),
+                pageCategories.getNumberOfElements()
+        );
+    }
+
+    @GetMapping("/roles")
+    public Map<String, Object> getAllRoleData(@RequestParam int draw,
+                                                  @RequestParam int start,
+                                                  @RequestParam int length,
+                                                  @RequestParam(value = "search[value]", required = false) String searchValue,
+                                                  @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+                                                  @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+        Page<Role> pageRoles;
+
+        String[] columnNames = {"id", "name"};
+        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+
+        if (searchValue != null && !searchValue.isEmpty()) {
+            pageRoles = roleService.searchRoles(searchValue, pageable);
+        } else {
+            pageRoles = roleService.findPaginated(pageable);
+        }
+
+        int totalCount = roleService.countAllRoles();
+        int currentPage = pageRoles.getNumber() + 1;
+
+        return getResponse(
+                draw,
+                totalCount,
+                pageRoles.getTotalElements(),
+                pageRoles.getContent(),
+                currentPage,
+                pageRoles.getTotalPages(),
+                pageRoles.getNumberOfElements()
         );
     }
 

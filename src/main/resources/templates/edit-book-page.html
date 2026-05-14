@@ -9,7 +9,8 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Edit Book')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${book}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${bookDto}" method="post">
+
             <input type="hidden" th:field="*{id}" />
 
             <div class="form-group">

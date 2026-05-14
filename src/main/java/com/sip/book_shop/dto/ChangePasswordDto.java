@@ -9,9 +9,9 @@ public class ChangePasswordDto {
 
     public Integer id;
 
-    @NotBlank(message = "Password is required!")
+    @NotBlank(message = "{user.password.blank}")
     public String password;
 
-    @NotBlank(message = "Confirm Password is required!")
+    @NotBlank(message = "{user.confirmPassword.blank}")
     public String confirmPassword;
 }

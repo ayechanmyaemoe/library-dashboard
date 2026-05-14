@@ -6,7 +6,10 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "books")
+@Table(name = "books",
+        uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"title", "published_year", "author_id", "category_id"})
+})
 public class Book implements BaseEntity {
 
     @Id

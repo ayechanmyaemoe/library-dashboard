@@ -9,7 +9,7 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Edit Author')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/authors/save}" th:object="${author}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/authors/save}" th:object="${authorDto}" method="post">
             <input type="hidden" th:field="*{id}" />
 
             <div class="form-group">
@@ -26,7 +26,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Birth Year:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="date" th:field="*{birthDate}"
+                    <input class="form-control" type="text" th:field="*{birthDate}" id="birthDatePicker"
                            th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">
                         BirthYear Error
@@ -44,6 +44,20 @@
     </div>
 
     <footer th:replace="layout :: footer">Footer</footer>
-
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const dateInput = document.querySelector("#birthDatePicker");
+        const existingValue = dateInput.value;
+        flatpickr(dateInput, {
+            dateFormat: "d/m/Y",
+            allowInput: false,
+            altInput: true,
+            altFormat: "d/m/Y",
+            maxDate: new Date().fp_incr(-1),
+            defaultDate: existingValue
+        });
+    });
+</script>
 </html>

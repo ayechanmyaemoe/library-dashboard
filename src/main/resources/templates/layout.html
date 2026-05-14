@@ -12,6 +12,9 @@
 
   <script th:src="@{/webjars/bootstrap/3.0.0/js/bootstrap.min.js}"></script>
   <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.0.0/css/bootstrap.min.css}">
+
+  <link rel="stylesheet" th:href="@{/webjars/flatpickr/4.1.4/dist/flatpickr.min.css}">
+  <script th:src="@{/webjars/flatpickr/4.1.4/dist/flatpickr.min.js}"></script>
   <link th:href="@{/css/core.css}" rel="stylesheet" />
 </head>
 <body>
@@ -45,12 +48,14 @@
 
 </body>
 
-<script th:fragment="action" th:inline="javascript">
+<script th:fragment="action">
   function renderActions(type, rowId) {
     let baseUrl;
     switch (type) {
       case 'book': baseUrl = '/books'; break;
       case 'author': baseUrl = '/authors'; break;
+      case 'category': baseUrl = '/categories'; break;
+      case 'role': baseUrl = '/roles'; break;
       default: baseUrl = '/users';
     }
 

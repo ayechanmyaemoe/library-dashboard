@@ -14,17 +14,17 @@ public class UserDto {
 
     public Integer id;
 
-    @NotBlank(message = "Username is required!", groups = BlankCheck.class)
+    @NotBlank(message = "{user.username.blank}", groups = BlankCheck.class)
     public String username;
 
-    @NotBlank(message = "Email is required!", groups = BlankCheck.class)
-    @Email(message = "Invalid email address!")
+    @NotBlank(message = "{user.email.blank}", groups = BlankCheck.class)
+    @Email(message = "{user.email.email}")
     public String email;
 
-    @NotBlank(message = "Password is required!", groups = BlankCheck.class)
+    @NotBlank(message = "{user.password.blank}", groups = BlankCheck.class)
     public String password;
 
-    @NotBlank(message = "Confirm Password is required!", groups = BlankCheck.class)
+    @NotBlank(message = "{user.confirmPassword.blank}", groups = BlankCheck.class)
     public String confirmPassword;
 
     public Role role;

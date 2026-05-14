@@ -9,7 +9,6 @@ import com.sip.book_shop.model.*;
 import com.sip.book_shop.service.RoleService;
 import com.sip.book_shop.service.UserService;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Objects;
 
-@Controller @Slf4j
+@Controller
 @RequestMapping("/users")
 public class UserController {
 
@@ -53,24 +52,24 @@ public class UserController {
         }
 
         if(userService.findByUsername(userDto.getUsername().trim()) != null) {
-            bindingResult.rejectValue("username", "error.userDto", "This username is already in use!");
+            bindingResult.rejectValue("username", "user.username.error.alreadyExists", "error.alreadyExists");
             return "register";
         }
 
         if(userService.findByEmail(userDto.getEmail().trim()) != null) {
-            bindingResult.rejectValue("email", "error.userDto", "This email is already in use!");
+            bindingResult.rejectValue("email", "user.email.error.alreadyExists", "error.alreadyExists");
             return "register";
         }
 
         if(!Objects.equals(userDto.getPassword().trim(), userDto.getConfirmPassword().trim())) {
-            bindingResult.rejectValue("confirmPassword", "error.userDto", "Passwords mismatch!");
+            bindingResult.rejectValue("confirmPassword", "user.password.error.mismatch", "error.mismatch");
             return "register";
         }
 
         try {
             User user = userMapper.toEntity(userDto);
             user.setPassword(passwordEncoder.encode(userDto.getPassword().trim()));
-            Role userRole = roleService.getRoleUser();
+            Role userRole = roleService.findByName("USER");
             user.setRole(userRole);
             userService.saveAccount(user);
         } catch (Exception e) {
@@ -87,33 +86,30 @@ public class UserController {
 
     @GetMapping("/add")
     public String addUser(Model model) {
-        model.addAttribute("user", new UserDto());
-
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
+        model.addAttribute("userDto", new UserDto());
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "add-user-page";
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateUser(@Valid @ModelAttribute("user") UserDto userDto, BindingResult bindingResult, Model model) {
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
+    public String insertOrUpdateUser(@Valid @ModelAttribute UserDto userDto, BindingResult bindingResult, Model model) {
+        model.addAttribute("allRoles", roleService.getAllRoles());
         if(bindingResult.hasErrors()) {
             return"add-user-page";
         }
 
         if(userService.findByUsername(userDto.getUsername().trim()) != null) {
-            bindingResult.rejectValue("username", "error.userDto", "This username is already in use!");
+            bindingResult.rejectValue("username", "user.username.error.alreadyExists", "error.alreadyExists");
             return "add-user-page";
         }
 
         if(userService.findByEmail(userDto.getEmail().trim()) != null) {
-            bindingResult.rejectValue("email", "error.userDto", "This email is already in use!");
+            bindingResult.rejectValue("email", "user.email.error.alreadyExists", "error.alreadyExists");
             return "add-user-page";
         }
 
         if(!Objects.equals(userDto.getPassword().trim(), userDto.getConfirmPassword().trim())) {
-            bindingResult.rejectValue("confirmPassword", "error.userDto", "Passwords mismatch!");
+            bindingResult.rejectValue("confirmPassword", "user.password.error.mismatch", "error.mismatch");
             return "add-user-page";
         }
         User user = userMapper.toEntity(userDto);
@@ -126,28 +122,32 @@ public class UserController {
     @GetMapping("/{id}/edit")
     public String editBook(Model model, @PathVariable int id) {
         User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
+        UserDto userDto = userMapper.toDto(user);
+        model.addAttribute("userDto", userDto);
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "edit-user-page";
     }
 
     @PostMapping("/update")
-    public String UpdateUser(@Valid @ModelAttribute("user") UserUpdateDto userUpdateDto, BindingResult bindingResult, Model model) {
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
+    public String UpdateUser(@Valid @ModelAttribute("userDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, Model model) {
+        model.addAttribute("allRoles", roleService.getAllRoles());
         if(bindingResult.hasErrors()) {
-            return "edit-user-page";
-        }
-
-        if(userService.findByEmail(userUpdateDto.getEmail().trim()) != null) {
-            bindingResult.rejectValue("email", "error.userDto", "This email is already in use!");
             return "edit-user-page";
         }
 
         if(userUpdateDto.getId() != null) {
             User user = userService.getUserById(userUpdateDto.getId());
+            if(!Objects.equals(user.getUsername(), userUpdateDto.getUsername())) {
+                if(userService.findByUsername(userUpdateDto.getUsername().trim()) != null) {
+                    bindingResult.rejectValue("username", "user.username.error.alreadyExists", "error.alreadyExists");
+                    return "edit-user-page";
+                }
+            } else if(!Objects.equals(user.getEmail(), userUpdateDto.getEmail())) {
+                if(userService.findByEmail(userUpdateDto.getEmail().trim()) != null) {
+                    bindingResult.rejectValue("email", "user.email.error.alreadyExists", "error.alreadyExists");
+                    return "edit-user-page";
+                }
+            }
             user.setUsername(userUpdateDto.getUsername().trim());
             user.setEmail(userUpdateDto.getEmail().trim());
             user.setRole(userUpdateDto.getRole());
@@ -170,17 +170,17 @@ public class UserController {
     public String changePassword(@PathVariable int id, Model model) {
         User user = userService.getUserById(id);
         ChangePasswordDto changePasswordDto = userMapper.toChangePasswordDto(user);
-        model.addAttribute("user", changePasswordDto);
+        model.addAttribute("userDto", changePasswordDto);
         return "user-change-password-page";
     }
 
     @PostMapping("/save-password")
-    public String SavePassword(@Valid @ModelAttribute("user") ChangePasswordDto changePasswordDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String SavePassword(@Valid @ModelAttribute("userDto") ChangePasswordDto changePasswordDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
             return "user-change-password-page";
         }
         if(!Objects.equals(changePasswordDto.getPassword().trim(), changePasswordDto.getConfirmPassword().trim())) {
-            bindingResult.rejectValue("confirmPassword", "error.user", "Passwords mismatch!");
+            bindingResult.rejectValue("confirmPassword", "user.password.error.mismatch", "error.mismatch");
             return "user-change-password-page";
         }
 

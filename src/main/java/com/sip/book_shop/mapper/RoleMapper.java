@@ -1,16 +1,16 @@
 package com.sip.book_shop.mapper;
 
-import com.sip.book_shop.dto.AuthorDto;
+import com.sip.book_shop.dto.RoleDto;
 import com.sip.book_shop.helper.MappingHelper;
-import com.sip.book_shop.model.Author;
+import com.sip.book_shop.model.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = MappingHelper.class)
-public interface AuthorMapper {
+public interface RoleMapper {
 
-    AuthorDto toDto(Author entity);
+    RoleDto toDto(Role entity);
 
     @Mapping(target = "name", source = "name", qualifiedByName = "trimString")
-    Author toEntity(AuthorDto dto);
+    Role toEntity(RoleDto dto);
 }

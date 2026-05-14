@@ -15,11 +15,11 @@ public class UserUpdateDto {
 
     private Integer id;
 
-    @NotBlank(message = "Username is required!", groups = BlankCheck.class)
+    @NotBlank(message = "{user.username.blank}", groups = BlankCheck.class)
     private String username;
 
-    @NotBlank(message = "Email is required!", groups = BlankCheck.class)
-    @Email(message = "Invalid email address!")
+    @NotBlank(message = "{user.email.blank}", groups = BlankCheck.class)
+    @Email(message = "{user.email.email}")
     private String email;
 
     private Role role;

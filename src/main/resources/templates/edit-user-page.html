@@ -9,7 +9,7 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Edit User')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/users/update}" th:object="${user}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/users/update}" th:object="${userDto}" method="post">
             <input type="hidden" th:field="*{id}" />
 
             <div class="form-group">

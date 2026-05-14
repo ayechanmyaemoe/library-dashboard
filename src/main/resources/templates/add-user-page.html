@@ -9,7 +9,7 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Add New User')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/users/save}" th:object="${user}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/users/save}" th:object="${userDto}" method="post">
 
             <div class="form-group">
                 <label class="col-lg-5 control-label">Username:</label>

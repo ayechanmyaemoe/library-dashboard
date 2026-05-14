@@ -35,12 +35,12 @@ public class AuthorController {
 
     @GetMapping("/add")
     public String addAuthor(Model model) {
-        model.addAttribute("author", new AuthorDto());
+        model.addAttribute("authorDto", new AuthorDto());
         return "add-author-page";
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateAuthor(@Valid @ModelAttribute("author") AuthorDto authorDto, BindingResult bindingResult) {
+    public String insertOrUpdateAuthor(@Valid @ModelAttribute AuthorDto authorDto, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             if(authorDto.getId() != null) {
                 return "edit-author-page";
@@ -52,7 +52,13 @@ public class AuthorController {
         Author author;
         if(authorDto.getId() != null) {
             author = authorService.getAuthorById(authorDto.getId());
+            author.setName(authorDto.getName().trim());
+            author.setBirthDate(authorDto.getBirthDate());
         } else {
+            if(authorService.findByName(authorDto.getName().trim()) != null) {
+                bindingResult.rejectValue("name", "author.error.alreadyExists", "error.alreadyExists");
+                return "add-author-page";
+            }
             author = authorMapper.toEntity(authorDto);
         }
         authorService.saveAuthor(author);
@@ -62,7 +68,8 @@ public class AuthorController {
     @GetMapping("/{id}/edit")
     public String editAuthor(Model model, @PathVariable int id) {
         Author author = authorService.getAuthorById(id);
-        model.addAttribute("author", author);
+        AuthorDto authorDto = authorMapper.toDto(author);
+        model.addAttribute("authorDto", authorDto);
         return "edit-author-page";
     }
 

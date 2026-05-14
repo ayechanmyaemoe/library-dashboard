@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
 
+    Author findByName(String name);
+
     @Query("select a from Author a where " +
             "lower(a.name) like lower(concat('%', :searchValue, '%')) or " +
             "cast(a.birthDate as string) like concat('%', :searchValue, '%')")

@@ -15,12 +15,15 @@ import lombok.Setter;
 public class BookDto {
 
     public Integer id;
-    @NotBlank(message = "This cannot be blank!", groups = BlankCheck.class)
+
+    @NotBlank(message = "{book.title.blank}", groups = BlankCheck.class)
     public String title;
 
-    @NotBlank(message = "This cannot be blank!", groups = BlankCheck.class)
-    @Pattern(regexp = "^\\d{4}$", message = "published year must be a 4-digit number!", groups = PatternCheck.class)
+    @NotBlank(message = "{book.publishedYear.blank}", groups = BlankCheck.class)
+    @Pattern(regexp = "^\\d{4}$", message = "{book.publishedYear.pattern}", groups = PatternCheck.class)
     public String publishedYear;
+
     public Author author;
+
     public Category category;
 }
