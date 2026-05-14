@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.Category;
@@ -39,7 +40,7 @@ public class CategoryService {
 
     public Category getCategoryById(int id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no category with such id."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("category.error.notFound")));
     }
 
     public Category findByName(String name) {
@@ -52,12 +53,12 @@ public class CategoryService {
 
     public void deleteCategoryById(int id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no category with such id"));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("category.error.notFound")));
 
         List<Book> books = bookRepository.findByCategoryId(category.getId());
 
         if(!books.isEmpty()) {
-            throw new IllegalStateException("There are still books with this category. You must delete them first!");
+            throw new IllegalStateException(MessageHelper.getMessage("category.error.denyDeletion"));
         }
 
         categoryRepository.deleteById(category.id);

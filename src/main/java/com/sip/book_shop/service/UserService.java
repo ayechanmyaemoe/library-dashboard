@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.UserRepository;
@@ -40,15 +41,15 @@ public class UserService {
 
     public User getUserById(int id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no user with such id."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("user.error.notFound")));
     }
 
     public void deleteUserById(String currentUsername, int id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no user with such id"));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("user.error.notFound")));
 
         if(currentUsername.equals(user.getUsername())) {
-            throw new IllegalStateException("Sorry! You can't delete current logged in user! Please ask other admins to perform this function.");
+            throw new IllegalStateException(MessageHelper.getMessage("user.error.denyDeletion"));
         }
         userRepository.deleteById(user.getId());
     }

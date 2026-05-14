@@ -1,5 +1,6 @@
 package com.sip.book_shop.handler;
 
+import com.sip.book_shop.helper.MessageHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -22,16 +23,16 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        String errorMessage = "Invalid username or password";
+        String errorMessage = MessageHelper.getMessage("user.error.invalid");
 
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            errorMessage = "Both username and password are required!";
+            errorMessage = MessageHelper.getMessage("user.error.required");
         } else if (exception.getMessage().equalsIgnoreCase("User is disabled")) {
-            errorMessage = "Your account has been disabled.";
+            errorMessage = MessageHelper.getMessage("user.error.disabled");
         } else if (exception.getMessage().equalsIgnoreCase("User account is locked")) {
-            errorMessage = "Your account is locked.";
+            errorMessage = MessageHelper.getMessage("user.error.locked");
         } else if (exception.getMessage().contains("User not found") || exception.getMessage().contains("Bad credentials")) {
-            errorMessage = "Invalid username or password!";
+            errorMessage = MessageHelper.getMessage("user.error.invalid");
         }
 
         response.sendRedirect("/login?error=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8));

@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.repository.AuthorRepository;
@@ -34,17 +35,17 @@ public class AuthorService {
 
     public Author getAuthorById(int id) {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no author with such id."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("author.error.notFound")));
     }
 
     public void deleteAuthorById(int id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no author with such id"));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("author.error.notFound")));
 
         List<Book> books = bookRepository.findByAuthorId(author.getId());
 
         if(!books.isEmpty()) {
-            throw new IllegalStateException("There are still books with this author. You must delete them first!");
+            throw new IllegalStateException(MessageHelper.getMessage("author.error.denyDeletion"));
         }
 
         authorRepository.deleteById(author.id);

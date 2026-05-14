@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Role;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.RoleRepository;
@@ -42,7 +43,7 @@ public class RoleService {
 
     public Role getRoleById(int id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no role with such id."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("role.error.notFound")));
     }
 
     public void saveRole(Role role) {
@@ -51,12 +52,12 @@ public class RoleService {
 
     public void deleteRoleById(int id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no role with such id"));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("role.error.notFound")));
 
         List<User> users = userRepository.findByRoleId(role.getId());
 
         if(!users.isEmpty()) {
-            throw new IllegalStateException("There are still users with this role. You must delete them first!");
+            throw new IllegalStateException(MessageHelper.getMessage("role.error.denyDeletion"));
         }
 
         roleRepository.deleteById(role.getId());

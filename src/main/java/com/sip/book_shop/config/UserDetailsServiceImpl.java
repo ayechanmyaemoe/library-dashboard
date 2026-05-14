@@ -1,5 +1,6 @@
 package com.sip.book_shop.config;
 
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if(user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException(MessageHelper.getMessage("user.error.usernameNotFound"));
         }
 
         return new UserDetailsImpl(user);
