@@ -1,7 +1,7 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.helper.MessageHelper;
-import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.Category;
 import com.sip.book_shop.repository.BookRepository;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -43,11 +44,11 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("category.error.notFound")));
     }
 
-    public Category findByName(String name) {
-        return categoryRepository.findByName(name);
-    }
-
     public void saveCategory(Category category) {
+        Optional<Category> existingCategory = categoryRepository.findByName(category.getName());
+        if (existingCategory.isPresent() && (category.getId() == 0 || existingCategory.get().getId() != category.getId())) {
+            throw new AlreadyExistsException("category.error.alreadyExists");
+        }
         categoryRepository.save(category);
     }
 

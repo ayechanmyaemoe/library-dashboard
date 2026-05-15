@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorService {
@@ -26,6 +28,10 @@ public class AuthorService {
     }
 
     public void saveAuthor(Author author) {
+        Optional<Author> existingAuthor = authorRepository.findByName(author.getName());
+        if (existingAuthor.isPresent() && (author.getId() == 0 || existingAuthor.get().getId() != author.getId())) {
+            throw new AlreadyExistsException("author.error.alreadyExists");
+        }
         authorRepository.save(author);
     }
 
@@ -57,9 +63,5 @@ public class AuthorService {
 
     public Page<Author> searchAuthors(String searchValue, Pageable pageable) {
         return authorRepository.searchByKeyword(searchValue, pageable);
-    }
-
-    public Author findByName(String name) {
-        return authorRepository.findByName(name);
     }
 }

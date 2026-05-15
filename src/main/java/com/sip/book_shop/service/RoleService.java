@@ -1,5 +1,6 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Role;
 import com.sip.book_shop.model.User;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoleService {
@@ -38,7 +40,7 @@ public class RoleService {
     }
 
     public Role findByName(String name) {
-        return roleRepository.findByName(name);
+        return roleRepository.findByName(name).orElse(null);
     }
 
     public Role getRoleById(int id) {
@@ -47,6 +49,12 @@ public class RoleService {
     }
 
     public void saveRole(Role role) {
+        String modifiedName = role.getName().trim().toUpperCase();
+        Optional<Role> existingRole = roleRepository.findByName(modifiedName);
+        if (existingRole.isPresent() && (role.getId() == 0 || existingRole.get().getId() != role.getId())) {
+            throw new AlreadyExistsException("role.error.alreadyExists");
+        }
+        role.setName(modifiedName);
         roleRepository.save(role);
     }
 

@@ -1,6 +1,8 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.AuthorDto;
+import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.mapper.AuthorMapper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.service.AuthorService;
@@ -40,28 +42,30 @@ public class AuthorController {
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateAuthor(@Valid @ModelAttribute AuthorDto authorDto, BindingResult bindingResult) {
+    public String insertOrUpdateAuthor(@Valid @ModelAttribute AuthorDto authorDto,
+                                       BindingResult bindingResult,
+                                       RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            if(authorDto.getId() != null) {
-                return "edit-author-page";
-            } else {
-                return "add-author-page";
-            }
+            return (authorDto.getId() != null) ? "edit-author-page" : "add-author-page";
         }
 
-        Author author;
-        if(authorDto.getId() != null) {
-            author = authorService.getAuthorById(authorDto.getId());
-            author.setName(authorDto.getName().trim());
-            author.setBirthDate(authorDto.getBirthDate());
-        } else {
-            if(authorService.findByName(authorDto.getName().trim()) != null) {
-                bindingResult.rejectValue("name", "author.error.alreadyExists", "error.alreadyExists");
-                return "add-author-page";
+        boolean isUpdate = authorDto.getId() != null;
+        try {
+            Author author;
+            if(isUpdate) {
+                author = authorService.getAuthorById(authorDto.getId());
+                author.setName(authorDto.getName().trim());
+                author.setBirthDate(authorDto.getBirthDate());
+            } else {
+                author = authorMapper.toEntity(authorDto);
             }
-            author = authorMapper.toEntity(authorDto);
+            authorService.saveAuthor(author);
+            String messageKey = isUpdate ? "author.success.edit" : "author.success.create";
+            redirectAttributes.addFlashAttribute("success", MessageHelper.getMessage(messageKey));
+        } catch (AlreadyExistsException e) {
+            bindingResult.rejectValue("name", e.getMessage(), "error.alreadyExists");
+            return isUpdate ? "edit-author-page" : "add-author-page";
         }
-        authorService.saveAuthor(author);
         return "redirect:/authors";
     }
 

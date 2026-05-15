@@ -22,5 +22,5 @@ public class UserUpdateDto {
     @Email(message = "{user.email.email}")
     private String email;
 
-    private Role role;
+    private RoleDto role;
 }

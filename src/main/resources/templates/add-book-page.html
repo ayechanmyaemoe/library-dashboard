@@ -36,7 +36,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Author:</label>
                 <div class="col-lg-8">
-                    <select class="form-control" th:field="*{author}" required>
+                    <select class="form-control" id="author" th:field="*{author.id}" required>
                         <option th:each="a : ${allAuthors}"
                                 th:value="${a.id}"
                                 th:text="${a.name}">
@@ -48,7 +48,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Category:</label>
                 <div class="col-lg-8">
-                    <select class="form-control" th:field="*{category}" required>
+                    <select class="form-control" id="category" th:field="*{category.id}" required>
                         <option th:each="cat : ${allCategories}"
                                 th:value="${cat.id}"
                                 th:text="${cat.name}">

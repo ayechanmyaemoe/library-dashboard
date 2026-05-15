@@ -1,6 +1,8 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.CategoryDto;
+import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.mapper.CategoryMapper;
 import com.sip.book_shop.model.Category;
 import com.sip.book_shop.service.CategoryService;
@@ -11,8 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/categories")
@@ -37,33 +37,29 @@ public class CategoryController {
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateCategory(@Valid @ModelAttribute CategoryDto categoryDto, BindingResult bindingResult) {
+    public String insertOrUpdateCategory(@Valid @ModelAttribute CategoryDto categoryDto,
+                                         BindingResult bindingResult,
+                                         RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            if(categoryDto.getId() != null) {
-                return "edit-category-page";
-            } else {
-                return "add-category-page";
-            }
+            return (categoryDto.getId() != null) ? "edit-category-page" : "add-category-page";
         }
 
-        Category category;
-        if(categoryDto.getId() != null) {
-            category = categoryService.getCategoryById(categoryDto.getId());
-            if(!Objects.equals(category.getName(), categoryDto.getName())) {
-                if(categoryService.findByName(categoryDto.getName().trim()) != null) {
-                    bindingResult.rejectValue("name", "category.error.alreadyExists", "error.alreadyExists");
-                    return "edit-category-page";
-                }
+        boolean isUpdate = categoryDto.getId() != null;
+        try {
+            Category category;
+            if(isUpdate) {
+                category = categoryService.getCategoryById(categoryDto.getId());
+                category.setName(categoryDto.getName().trim());
+            } else {
+                category = categoryMapper.toEntity(categoryDto);
             }
-            category.setName(categoryDto.getName().trim());
-        } else {
-            if(categoryService.findByName(categoryDto.getName().trim()) != null) {
-                bindingResult.rejectValue("name", "category.error.alreadyExists", "error.alreadyExists");
-                return "add-category-page";
-            }
-            category = categoryMapper.toEntity(categoryDto);
+            categoryService.saveCategory(category);
+            String messageKey = isUpdate ? "category.success.edit" : "category.success.create";
+            redirectAttributes.addFlashAttribute("success", MessageHelper.getMessage(messageKey));
+        } catch (AlreadyExistsException e) {
+            bindingResult.rejectValue("name", e.getMessage(), "error.alreadyExists");
+            return isUpdate ? "edit-category-page" : "add-category-page";
         }
-        categoryService.saveCategory(category);
         return "redirect:/categories";
     }
 

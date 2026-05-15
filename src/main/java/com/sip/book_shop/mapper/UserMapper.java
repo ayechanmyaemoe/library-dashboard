@@ -7,7 +7,7 @@ import com.sip.book_shop.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = MappingHelper.class)
+@Mapper(componentModel = "spring", uses = {MappingHelper.class, RoleMapper.class})
 public interface UserMapper {
 
     UserDto toDto(User entity);

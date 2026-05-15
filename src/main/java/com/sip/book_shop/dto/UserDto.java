@@ -27,5 +27,5 @@ public class UserDto {
     @NotBlank(message = "{user.confirmPassword.blank}", groups = BlankCheck.class)
     public String confirmPassword;
 
-    public Role role;
+    public RoleDto role;
 }

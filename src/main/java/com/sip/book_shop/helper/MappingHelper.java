@@ -10,4 +10,12 @@ public class MappingHelper {
     public String trimString(String value) {
         return value != null ? value.trim() : null;
     }
+
+    @Named("trimAndUpperCase")
+    public String trimAndUpperCase(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.trim().toUpperCase();
+    }
 }

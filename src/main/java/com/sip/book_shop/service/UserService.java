@@ -1,7 +1,9 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.dto.UserUpdateDto;
+import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.helper.MessageHelper;
-import com.sip.book_shop.model.Book;
+import com.sip.book_shop.mapper.RoleMapper;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleMapper roleMapper;
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -24,6 +29,28 @@ public class UserService {
     }
 
     public void saveAccount(User user) {
+        userRepository.save(user);
+    }
+
+    public void updateUser(UserUpdateDto updateDto) {
+        User user = userRepository.findById(updateDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("user.error.notFound")));
+
+        if (!user.getUsername().equals(updateDto.getUsername())) {
+            if (userRepository.existsByUsername(updateDto.getUsername())) {
+                throw new AlreadyExistsException("Username");
+            }
+            user.setUsername(updateDto.getUsername().trim());
+        }
+
+        if (!user.getEmail().equals(updateDto.getEmail())) {
+            if (userRepository.existsByEmail(updateDto.getEmail())) {
+                throw new AlreadyExistsException("Email");
+            }
+            user.setEmail(updateDto.getEmail().trim());
+        }
+
+        user.setRole(roleMapper.toEntity(updateDto.getRole()));
         userRepository.save(user);
     }
 

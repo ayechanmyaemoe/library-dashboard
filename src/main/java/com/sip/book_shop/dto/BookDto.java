@@ -23,7 +23,7 @@ public class BookDto {
     @Pattern(regexp = "^\\d{4}$", message = "{book.publishedYear.pattern}", groups = PatternCheck.class)
     public String publishedYear;
 
-    public Author author;
+    public AuthorDto author;
 
-    public Category category;
+    public CategoryDto category;
 }

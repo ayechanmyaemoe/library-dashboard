@@ -11,6 +11,6 @@ public interface RoleMapper {
 
     RoleDto toDto(Role entity);
 
-    @Mapping(target = "name", source = "name", qualifiedByName = "trimString")
+    @Mapping(target = "name", source = "name", qualifiedByName = "trimAndUpperCase")
     Role toEntity(RoleDto dto);
 }

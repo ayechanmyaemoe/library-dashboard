@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Username:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{username}"
+                    <input class="form-control" type="text" th:field="*{username}" placeholder="Enter username"
                            th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
                         Username Error
@@ -26,7 +26,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Email:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{email}"
+                    <input class="form-control" type="text" th:field="*{email}" placeholder="Enter email"
                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
                         Email Error
@@ -37,7 +37,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Role:</label>
                 <div class="col-lg-8">
-                    <select class="form-control" th:field="*{role}" required>
+                    <select class="form-control" id="role" th:field="*{role.id}" required>
                         <option th:each="role : ${allRoles}"
                                 th:value="${role.id}"
                                 th:text="${role.name}">

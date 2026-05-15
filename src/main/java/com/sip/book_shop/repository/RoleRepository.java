@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
 
-    Role findByName(String name);
+    Optional<Role> findByName(String name);
 
     @Query("select r from Role r where " +
             "lower(r.name) like lower(concat('%', :searchValue, '%'))")

@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
-    Category findByName(String name);
+    Optional<Category> findByName(String name);
 
     @Query("select c from Category c where " +
             "lower(c.name) like lower(concat('%', :searchValue, '%'))")

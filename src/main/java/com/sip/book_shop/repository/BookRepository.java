@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
@@ -25,7 +26,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             "lower(b.category.name) like lower(concat('%', :searchValue, '%'))")
     Page<Book> searchByKeyword(@Param("searchValue") String searchValue, Pageable pageable);
 
-    boolean existsByTitleAndAuthorAndCategoryAndPublishedYear(
+    Optional<Book> findByTitleAndAuthorAndCategoryAndPublishedYear(
             String title, Author author, Category category, int publishedYear
     );
 }

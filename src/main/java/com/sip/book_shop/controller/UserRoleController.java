@@ -1,6 +1,8 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.RoleDto;
+import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.mapper.RoleMapper;
 import com.sip.book_shop.model.Role;
 import com.sip.book_shop.service.RoleService;
@@ -24,10 +26,6 @@ public class UserRoleController {
     @Autowired
     private RoleMapper roleMapper;
 
-    public UserRoleController(RoleService roleService) {
-        this.roleService = roleService;
-    }
-
     @GetMapping
     public String getAllRoles(Model model) {
         model.addAttribute("module", "roles");
@@ -41,33 +39,29 @@ public class UserRoleController {
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateRole(@Valid @ModelAttribute RoleDto roleDto, BindingResult bindingResult) {
+    public String insertOrUpdateRole(@Valid @ModelAttribute RoleDto roleDto,
+                                     BindingResult bindingResult,
+                                     RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            if(roleDto.getId() != null) {
-                return "edit-role-page";
-            } else {
-                return "add-role-page";
-            }
+            return (roleDto.getId() != null) ? "edit-role-page" : "add-role-page";
         }
 
-        Role role;
-        if(roleDto.getId() != null) {
-            role = roleService.getRoleById(roleDto.getId());
-            if(!Objects.equals(role.getName(), roleDto.getName())) {
-                if(roleService.findByName(roleDto.getName().trim()) != null) {
-                    bindingResult.rejectValue("name", "role.error.alreadyExists", "error.alreadyExists");
-                    return "edit-role-page";
-                }
+        boolean isUpdate = roleDto.getId() != null;
+        try {
+            Role role;
+            if(isUpdate) {
+                role = roleService.getRoleById(roleDto.getId());
+                role.setName(roleDto.getName());
+            } else {
+                role = roleMapper.toEntity(roleDto);
             }
-            role.setName(roleDto.getName().trim().toUpperCase());
-        } else {
-            if(roleService.findByName(roleDto.getName().trim()) != null) {
-                bindingResult.rejectValue("name", "role.error.alreadyExists", "error.alreadyExists");
-                return "add-role-page";
-            }
-            role = roleMapper.toEntity(roleDto);
+            roleService.saveRole(role);
+            String messageKey = isUpdate ? "role.success.edit" : "role.success.create";
+            redirectAttributes.addFlashAttribute("success", MessageHelper.getMessage(messageKey));
+        } catch (AlreadyExistsException e) {
+            bindingResult.rejectValue("name", e.getMessage(), "error.alreadyExists");
+            return isUpdate ? "edit-role-page" : "add-role-page";
         }
-        roleService.saveRole(role);
         return "redirect:/roles";
     }
 

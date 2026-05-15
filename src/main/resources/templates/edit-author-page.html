@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Name:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{name}"
+                    <input class="form-control" type="text" th:field="*{name}" placeholder="Enter author name"
                            th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"/>
                     <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
                         Name Error

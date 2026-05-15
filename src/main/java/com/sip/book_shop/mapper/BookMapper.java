@@ -7,11 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = MappingHelper.class)
+@Mapper(componentModel = "spring", uses = {MappingHelper.class, AuthorMapper.class, CategoryMapper.class})
 public interface BookMapper {
 
     BookDto toDto(Book entity);
 
     @Mapping(target = "title", source = "title", qualifiedByName = "trimString")
+    @Mapping(target = "publishedYear", source = "publishedYear")
     Book toEntity(BookDto dto);
 }
