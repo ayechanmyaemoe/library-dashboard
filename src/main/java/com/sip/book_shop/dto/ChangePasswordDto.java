@@ -9,8 +9,11 @@ public class ChangePasswordDto {
 
     public Integer id;
 
-    @NotBlank(message = "{user.password.blank}")
-    public String password;
+    @NotBlank(message = "{user.oldPassword.blank}")
+    public String oldPassword;
+
+    @NotBlank(message = "{user.newPassword.blank}")
+    public String newPassword;
 
     @NotBlank(message = "{user.confirmPassword.blank}")
     public String confirmPassword;

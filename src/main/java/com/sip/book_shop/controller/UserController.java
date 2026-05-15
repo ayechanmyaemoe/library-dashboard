@@ -5,6 +5,7 @@ import com.sip.book_shop.dto.ChangePasswordDto;
 import com.sip.book_shop.dto.UserDto;
 import com.sip.book_shop.dto.UserUpdateDto;
 import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.exception.MisMatchException;
 import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.mapper.RoleMapper;
 import com.sip.book_shop.mapper.UserMapper;
@@ -66,7 +67,7 @@ public class UserController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/register?success";
+        return "redirect:/users/register?success=true";
     }
 
     @GetMapping
@@ -149,17 +150,21 @@ public class UserController {
                                BindingResult bindingResult,
                                RedirectAttributes redirectAttributes) {
 
-        if(!Objects.equals(changePasswordDto.getPassword().trim(), changePasswordDto.getConfirmPassword().trim())) {
-            bindingResult.rejectValue("confirmPassword", "user.password.error.mismatch", "error.mismatch");
-        }
-
         if (bindingResult.hasErrors()) return "user-change-password-page";
 
-        if(changePasswordDto.getId() != null) {
-            User user = userService.getUserById(changePasswordDto.getId());
-            user.setPassword(passwordEncoder.encode(changePasswordDto.getPassword().trim()));
-            userService.saveAccount(user);
-            redirectAttributes.addFlashAttribute("success", "You have successfully updated " + user.getUsername() +  "'s password!");
+        try {
+            if(changePasswordDto.getId() != null) {
+                User user = userService.getChangePasswordUser(passwordEncoder, changePasswordDto);
+                user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword().trim()));
+                userService.saveAccount(user);
+                redirectAttributes.addFlashAttribute("success", "You have successfully updated " + user.getUsername() +  "'s password!");
+            }
+        } catch (MisMatchException e) {
+            bindingResult.rejectValue("confirmPassword", "user.password.error.mismatch", e.getMessage());
+            return "user-change-password-page";
+        } catch (IllegalArgumentException e) {
+            bindingResult.rejectValue("oldPassword", "user.oldPassword.error.invalid", e.getMessage());
+            return "user-change-password-page";
         }
         return "redirect:/users";
     }

@@ -1,7 +1,9 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.dto.ChangePasswordDto;
 import com.sip.book_shop.dto.UserUpdateDto;
 import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.exception.MisMatchException;
 import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.mapper.RoleMapper;
 import com.sip.book_shop.model.User;
@@ -9,7 +11,10 @@ import com.sip.book_shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -79,5 +84,17 @@ public class UserService {
             throw new IllegalStateException(MessageHelper.getMessage("user.error.denyDeletion"));
         }
         userRepository.deleteById(user.getId());
+    }
+
+    public User getChangePasswordUser(PasswordEncoder passwordEncoder, ChangePasswordDto dto) {
+        if(!Objects.equals(dto.getNewPassword().trim(), dto.getConfirmPassword().trim())) {
+            throw new MisMatchException(MessageHelper.getMessage("error.mismatch"));
+        }
+
+        User changePasswordUser = getUserById(dto.getId());
+        if (!passwordEncoder.matches(dto.getOldPassword().trim(), changePasswordUser.getPassword())) {
+            throw new IllegalArgumentException(MessageHelper.getMessage("error.invalid"));
+        }
+        return changePasswordUser;
     }
 }
