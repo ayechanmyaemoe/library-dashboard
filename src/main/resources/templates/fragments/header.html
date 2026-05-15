@@ -13,9 +13,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">SIP Library</a>
+                <span class="navbar-brand">SIP Library</span>
             </div>
-            <div class="navbar-collapse collapse">
+            <div class="navbar-collapse collapse" th:if="${module != 'login' && module != 'register'}">
                 <ul class="nav navbar-nav">
                     <li th:classappend="${module == 'home' ? 'active' : ''}">
                         <a href="#" th:href="@{/}">Home</a>
@@ -25,6 +25,45 @@
                     </li>
                     <li th:classappend="${module == 'authors' ? 'active' : ''}">
                         <a href="#" th:href="@{/authors}">Authors</a>
+                    </li>
+                    <li th:if="${isAdmin}" th:classappend="${module == 'users' ? 'active' : ''}">
+                        <a href="#" th:href="@{/users}">Users</a>
+                    </li>
+                    <li th:if="${isAdmin}" th:classappend="${module == 'categories' ? 'active' : ''}">
+                        <a href="#" th:href="@{/categories}">Categories</a>
+                    </li>
+                    <li th:if="${isAdmin}" th:classappend="${module == 'roles' ? 'active' : ''}">
+                        <a href="#" th:href="@{/roles}">Roles</a>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li th:if="${username}" th:text="${username}" style="color: #999; padding: 17px 15px; font-size: 18px;">
+                        <span>Username</span>
+                    </li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" style="padding: 10px 15px;">
+                            <button type="submit" class="btn btn-link navbar-btn"
+                                    style="text-decoration: none; color: #9d9d9d; padding: 0;">
+                                <span class="glyphicon glyphicon-log-out"></span> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="navbar-collapse collapse" th:if="${module == 'login'}">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" th:href="@{/users/register}">Register</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="navbar-collapse collapse" th:if="${module == 'register'}">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" th:href="@{/login}">Login</a>
                     </li>
                 </ul>
             </div>

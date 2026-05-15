@@ -9,13 +9,14 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Edit Book')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${book}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/books/save}" th:object="${bookDto}" method="post">
+
             <input type="hidden" th:field="*{id}" />
 
             <div class="form-group">
                 <label class="col-lg-4 control-label">Title:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{title}"
+                    <input class="form-control" type="text" th:field="*{title}" placeholder="Enter book title"
                            th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
                         Title Error
@@ -26,7 +27,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Published Year:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{publishedYear}"
+                    <input class="form-control" type="text" th:field="*{publishedYear}" placeholder="Enter published year"
                            th:classappend="${#fields.hasErrors('publishedYear')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('publishedYear')}" th:errors="*{publishedYear}">
                         Published Year Error
@@ -37,7 +38,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Author:</label>
                 <div class="col-lg-8">
-                    <select class="form-control" th:field="*{author}" required>
+                    <select class="form-control" id="author" th:field="*{author.id}" required>
                         <option th:each="a : ${allAuthors}"
                                 th:value="${a.id}"
                                 th:text="${a.name}">
@@ -49,7 +50,7 @@
             <div class="form-group">
                 <label class="col-lg-4 control-label">Category:</label>
                 <div class="col-lg-8">
-                    <select class="form-control" th:field="*{category}" required>
+                    <select class="form-control" id="category" th:field="*{category.id}" required>
                         <option th:each="cat : ${allCategories}"
                                 th:value="${cat.id}"
                                 th:text="${cat.name}">

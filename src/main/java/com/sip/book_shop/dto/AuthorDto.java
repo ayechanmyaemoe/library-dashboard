@@ -19,11 +19,11 @@ public class AuthorDto {
 
     public Integer id;
 
-    @NotBlank(message = "This cannot be blank!", groups = BlankCheck.class)
+    @NotBlank(message = "{author.name.blank}", groups = BlankCheck.class)
     public String name;
 
-    @NotNull(message = "This cannot be blank!", groups = BlankCheck.class)
-    @Past(message = "Birth date must be in the past!", groups = BirthDateValidCheck.class)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "{author.birthDate.null}", groups = BlankCheck.class)
+    @Past(message = "{author.birthDate.past}", groups = BirthDateValidCheck.class)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     public LocalDate birthDate;
 }

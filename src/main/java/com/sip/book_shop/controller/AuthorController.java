@@ -1,6 +1,9 @@
 package com.sip.book_shop.controller;
 
 import com.sip.book_shop.dto.AuthorDto;
+import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.helper.MessageHelper;
+import com.sip.book_shop.mapper.AuthorMapper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.service.AuthorService;
 import jakarta.validation.Valid;
@@ -18,48 +21,59 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
 
+    @Autowired
+    private AuthorMapper authorMapper;
+
     @GetMapping("/")
     public String index() {
         return "redirect:/authors";
     }
 
     @GetMapping
-    public String getAllBooks() {
+    public String getAllBooks(Model model) {
+        model.addAttribute("module", "authors");
         return "author-list-page";
     }
 
     @GetMapping("/add")
     public String addAuthor(Model model) {
-        model.addAttribute("author", new AuthorDto());
+        model.addAttribute("authorDto", new AuthorDto());
         return "add-author-page";
     }
 
     @PostMapping("/save")
-    public String insertOrUpdateAuthor(@Valid @ModelAttribute("author") AuthorDto authorDto, BindingResult bindingResult) {
+    public String insertOrUpdateAuthor(@Valid @ModelAttribute AuthorDto authorDto,
+                                       BindingResult bindingResult,
+                                       RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            if(authorDto.getId() != null) {
-                return "edit-author-page";
-            } else {
-                return "add-author-page";
-            }
+            return (authorDto.getId() != null) ? "edit-author-page" : "add-author-page";
         }
 
-        Author author;
-        if(authorDto.getId() != null) {
-            author = authorService.getAuthorById(authorDto.getId());
-        } else {
-            author = new Author();
+        boolean isUpdate = authorDto.getId() != null;
+        try {
+            Author author;
+            if(isUpdate) {
+                author = authorService.getAuthorById(authorDto.getId());
+                author.setName(authorDto.getName().trim());
+                author.setBirthDate(authorDto.getBirthDate());
+            } else {
+                author = authorMapper.toEntity(authorDto);
+            }
+            authorService.saveAuthor(author);
+            String messageKey = isUpdate ? "author.success.edit" : "author.success.create";
+            redirectAttributes.addFlashAttribute("success", MessageHelper.getMessage(messageKey));
+        } catch (AlreadyExistsException e) {
+            bindingResult.rejectValue("name", e.getMessage(), "error.alreadyExists");
+            return isUpdate ? "edit-author-page" : "add-author-page";
         }
-        author.setName(authorDto.getName().trim());
-        author.setBirthDate(authorDto.getBirthDate());
-        authorService.saveAuthor(author);
         return "redirect:/authors";
     }
 
     @GetMapping("/{id}/edit")
     public String editAuthor(Model model, @PathVariable int id) {
         Author author = authorService.getAuthorById(id);
-        model.addAttribute("author", author);
+        AuthorDto authorDto = authorMapper.toDto(author);
+        model.addAttribute("authorDto", authorDto);
         return "edit-author-page";
     }
 

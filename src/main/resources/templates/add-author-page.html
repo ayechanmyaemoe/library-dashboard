@@ -9,11 +9,11 @@
 
     <div class="container text-start">
         <div th:replace="layout :: pageTitle('Add New Author')"></div>
-        <form class="form-narrow form-horizontal" th:action="@{/authors/save}" th:object="${author}" method="post">
+        <form class="form-narrow form-horizontal" th:action="@{/authors/save}" th:object="${authorDto}" method="post">
 
             <div class="form-group">
-                <label class="col-lg-4 control-label">Name:</label>
-                <div class="col-lg-8">
+                <label class="col-lg-3 control-label">Name:</label>
+                <div class="col-lg-9">
                     <input class="form-control" type="text" th:field="*{name}" placeholder="Enter author name"
                            th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
@@ -23,9 +23,10 @@
             </div>
 
             <div class="form-group">
-                <label class="col-lg-4 control-label">Birth Date:</label>
-                <div class="col-lg-8">
-                    <input class="form-control" type="text" th:field="*{birthDate}" placeholder="Enter birth date (yyyy-MM-dd)"
+                <label class="col-lg-3 control-label">Birth Date:</label>
+                <div class="col-lg-9">
+                    <input class="form-control" type="text" id="birthDatePicker" th:field="*{birthDate}"
+                           placeholder="Click to insert"
                            th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid' : ''" />
                     <div class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">
                         BirthYear Error
@@ -46,4 +47,15 @@
     <footer th:replace="layout :: footer">Footer</footer>
 
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("#birthDatePicker", {
+            dateFormat: "d/m/Y",
+            allowInput: false,
+            altInput: true,
+            altFormat: "d/m/Y",
+            maxDate: new Date().fp_incr(-1)
+        });
+    });
+</script>
 </html>

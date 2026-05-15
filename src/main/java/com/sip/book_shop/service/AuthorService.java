@@ -1,5 +1,7 @@
 package com.sip.book_shop.service;
 
+import com.sip.book_shop.exception.AlreadyExistsException;
+import com.sip.book_shop.helper.MessageHelper;
 import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.repository.AuthorRepository;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorService {
@@ -25,22 +28,30 @@ public class AuthorService {
     }
 
     public void saveAuthor(Author author) {
+        Optional<Author> existingAuthor = authorRepository.findByName(author.getName());
+        if (existingAuthor.isPresent() && (author.getId() == 0 || existingAuthor.get().getId() != author.getId())) {
+            throw new AlreadyExistsException("author.error.alreadyExists");
+        }
         authorRepository.save(author);
+    }
+
+    public int countAllAuthors() {
+        return authorRepository.findAll().size();
     }
 
     public Author getAuthorById(int id) {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no author with such id."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("author.error.notFound")));
     }
 
     public void deleteAuthorById(int id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("There is no author with such id"));
+                .orElseThrow(() -> new IllegalArgumentException(MessageHelper.getMessage("author.error.notFound")));
 
         List<Book> books = bookRepository.findByAuthorId(author.getId());
 
         if(!books.isEmpty()) {
-            throw new IllegalStateException("There are still books with this author. You must delete them first!");
+            throw new IllegalStateException(MessageHelper.getMessage("author.error.denyDeletion"));
         }
 
         authorRepository.deleteById(author.id);

@@ -1,12 +1,13 @@
 package com.sip.book_shop.model;
 
+import com.sip.book_shop.model.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "categories")
-public class Category {
+public class Category implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
