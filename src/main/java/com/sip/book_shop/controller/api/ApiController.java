@@ -36,165 +36,165 @@ public class ApiController {
     @Autowired
     private RoleService roleService;
 
-    @GetMapping("/books")
-    public Map<String, Object> getAllBookData(@RequestParam int draw,
-                                              @RequestParam int start,
-                                              @RequestParam int length,
-                                              @RequestParam(value = "search[value]", required = false) String searchValue,
-                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
-                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
-        Page<Book> pageBooks;
+//    @GetMapping("/books")
+//    public Map<String, Object> getAllBookData(@RequestParam int draw,
+//                                              @RequestParam int start,
+//                                              @RequestParam int length,
+//                                              @RequestParam(value = "search[value]", required = false) String searchValue,
+//                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+//                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+//        Page<Book> pageBooks;
+//
+//        String[] columnNames = {"id", "title", "author.name", "category.name", "publishedYear"};
+//        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//
+//        if (searchValue != null && !searchValue.isEmpty()) {
+//            pageBooks = bookService.searchBooks(searchValue, pageable);
+//        } else {
+//            pageBooks = bookService.findPaginated(pageable);
+//        }
+//
+//        int totalCount = bookService.countAllBooks();
+//        int currentPage = pageBooks.getNumber() + 1;
+//
+//        return getResponse(
+//                draw,
+//                totalCount,
+//                pageBooks.getTotalElements(),
+//                pageBooks.getContent(),
+//                currentPage,
+//                pageBooks.getTotalPages(),
+//                pageBooks.getNumberOfElements()
+//        );
+//    }
 
-        String[] columnNames = {"id", "title", "author.name", "category.name", "publishedYear"};
-        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//    @GetMapping("/authors")
+//    public Map<String, Object> getAllAuthorData(@RequestParam int draw,
+//                                              @RequestParam int start,
+//                                              @RequestParam int length,
+//                                              @RequestParam(value = "search[value]", required = false) String searchValue,
+//                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+//                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+//        Page<Author> pageAuthors;
+//
+//        String[] columnNames = {"id", "name", "birthDate"};
+//        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//
+//        if (searchValue != null && !searchValue.isEmpty()) {
+//            pageAuthors = authorService.searchAuthors(searchValue, pageable);
+//        } else {
+//            pageAuthors = authorService.findPaginated(pageable);
+//        }
+//
+//        int totalCount = authorService.countAllAuthors();
+//        int currentPage = pageAuthors.getNumber() + 1;
+//
+//        return getResponse(
+//                draw,
+//                totalCount,
+//                pageAuthors.getTotalElements(),
+//                pageAuthors.getContent(),
+//                currentPage,
+//                pageAuthors.getTotalPages(),
+//                pageAuthors.getNumberOfElements()
+//        );
+//    }
 
-        if (searchValue != null && !searchValue.isEmpty()) {
-            pageBooks = bookService.searchBooks(searchValue, pageable);
-        } else {
-            pageBooks = bookService.findPaginated(pageable);
-        }
+//    @GetMapping("/users")
+//    public Map<String, Object> getAllUserData(@RequestParam int draw,
+//                                                @RequestParam int start,
+//                                                @RequestParam int length,
+//                                                @RequestParam(value = "search[value]", required = false) String searchValue,
+//                                                @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+//                                                @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+//        Page<User> pageUsers;
+//
+//        String[] columnNames = {"id", "username", "email", "role"};
+//        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//
+//        if (searchValue != null && !searchValue.isEmpty()) {
+//            pageUsers = userService.searchUsers(searchValue, pageable);
+//        } else {
+//            pageUsers = userService.findPaginated(pageable);
+//        }
+//
+//        int totalCount = userService.countAllUsers();
+//        int currentPage = pageUsers.getNumber() + 1;
+//
+//        return getResponse(
+//                draw,
+//                totalCount,
+//                pageUsers.getTotalElements(),
+//                pageUsers.getContent(),
+//                currentPage,
+//                pageUsers.getTotalPages(),
+//                pageUsers.getNumberOfElements()
+//        );
+//    }
 
-        int totalCount = bookService.countAllBooks();
-        int currentPage = pageBooks.getNumber() + 1;
+//    @GetMapping("/categories")
+//    public Map<String, Object> getAllCategoryData(@RequestParam int draw,
+//                                              @RequestParam int start,
+//                                              @RequestParam int length,
+//                                              @RequestParam(value = "search[value]", required = false) String searchValue,
+//                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+//                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+//        Page<Category> pageCategories;
+//
+//        String[] columnNames = {"id", "name"};
+//        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//
+//        if (searchValue != null && !searchValue.isEmpty()) {
+//            pageCategories = categoryService.searchCategories(searchValue, pageable);
+//        } else {
+//            pageCategories = categoryService.findPaginated(pageable);
+//        }
+//
+//        int totalCount = categoryService.countAllCategories();
+//        int currentPage = pageCategories.getNumber() + 1;
+//
+//        return getResponse(
+//                draw,
+//                totalCount,
+//                pageCategories.getTotalElements(),
+//                pageCategories.getContent(),
+//                currentPage,
+//                pageCategories.getTotalPages(),
+//                pageCategories.getNumberOfElements()
+//        );
+//    }
 
-        return getResponse(
-                draw,
-                totalCount,
-                pageBooks.getTotalElements(),
-                pageBooks.getContent(),
-                currentPage,
-                pageBooks.getTotalPages(),
-                pageBooks.getNumberOfElements()
-        );
-    }
-
-    @GetMapping("/authors")
-    public Map<String, Object> getAllAuthorData(@RequestParam int draw,
-                                              @RequestParam int start,
-                                              @RequestParam int length,
-                                              @RequestParam(value = "search[value]", required = false) String searchValue,
-                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
-                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
-        Page<Author> pageAuthors;
-
-        String[] columnNames = {"id", "name", "birthDate"};
-        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
-
-        if (searchValue != null && !searchValue.isEmpty()) {
-            pageAuthors = authorService.searchAuthors(searchValue, pageable);
-        } else {
-            pageAuthors = authorService.findPaginated(pageable);
-        }
-
-        int totalCount = authorService.countAllAuthors();
-        int currentPage = pageAuthors.getNumber() + 1;
-
-        return getResponse(
-                draw,
-                totalCount,
-                pageAuthors.getTotalElements(),
-                pageAuthors.getContent(),
-                currentPage,
-                pageAuthors.getTotalPages(),
-                pageAuthors.getNumberOfElements()
-        );
-    }
-
-    @GetMapping("/users")
-    public Map<String, Object> getAllUserData(@RequestParam int draw,
-                                                @RequestParam int start,
-                                                @RequestParam int length,
-                                                @RequestParam(value = "search[value]", required = false) String searchValue,
-                                                @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
-                                                @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
-        Page<User> pageUsers;
-
-        String[] columnNames = {"id", "username", "email", "role"};
-        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
-
-        if (searchValue != null && !searchValue.isEmpty()) {
-            pageUsers = userService.searchUsers(searchValue, pageable);
-        } else {
-            pageUsers = userService.findPaginated(pageable);
-        }
-
-        int totalCount = userService.countAllUsers();
-        int currentPage = pageUsers.getNumber() + 1;
-
-        return getResponse(
-                draw,
-                totalCount,
-                pageUsers.getTotalElements(),
-                pageUsers.getContent(),
-                currentPage,
-                pageUsers.getTotalPages(),
-                pageUsers.getNumberOfElements()
-        );
-    }
-
-    @GetMapping("/categories")
-    public Map<String, Object> getAllCategoryData(@RequestParam int draw,
-                                              @RequestParam int start,
-                                              @RequestParam int length,
-                                              @RequestParam(value = "search[value]", required = false) String searchValue,
-                                              @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
-                                              @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
-        Page<Category> pageCategories;
-
-        String[] columnNames = {"id", "name"};
-        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
-
-        if (searchValue != null && !searchValue.isEmpty()) {
-            pageCategories = categoryService.searchCategories(searchValue, pageable);
-        } else {
-            pageCategories = categoryService.findPaginated(pageable);
-        }
-
-        int totalCount = categoryService.countAllCategories();
-        int currentPage = pageCategories.getNumber() + 1;
-
-        return getResponse(
-                draw,
-                totalCount,
-                pageCategories.getTotalElements(),
-                pageCategories.getContent(),
-                currentPage,
-                pageCategories.getTotalPages(),
-                pageCategories.getNumberOfElements()
-        );
-    }
-
-    @GetMapping("/roles")
-    public Map<String, Object> getAllRoleData(@RequestParam int draw,
-                                                  @RequestParam int start,
-                                                  @RequestParam int length,
-                                                  @RequestParam(value = "search[value]", required = false) String searchValue,
-                                                  @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
-                                                  @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
-        Page<Role> pageRoles;
-
-        String[] columnNames = {"id", "name"};
-        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
-
-        if (searchValue != null && !searchValue.isEmpty()) {
-            pageRoles = roleService.searchRoles(searchValue, pageable);
-        } else {
-            pageRoles = roleService.findPaginated(pageable);
-        }
-
-        int totalCount = roleService.countAllRoles();
-        int currentPage = pageRoles.getNumber() + 1;
-
-        return getResponse(
-                draw,
-                totalCount,
-                pageRoles.getTotalElements(),
-                pageRoles.getContent(),
-                currentPage,
-                pageRoles.getTotalPages(),
-                pageRoles.getNumberOfElements()
-        );
-    }
+//    @GetMapping("/roles")
+//    public Map<String, Object> getAllRoleData(@RequestParam int draw,
+//                                                  @RequestParam int start,
+//                                                  @RequestParam int length,
+//                                                  @RequestParam(value = "search[value]", required = false) String searchValue,
+//                                                  @RequestParam(value = "order[0][column]", defaultValue = "0") int columnIndex,
+//                                                  @RequestParam(value = "order[0][dir]", defaultValue = "asc") String sortDir) {
+//        Page<Role> pageRoles;
+//
+//        String[] columnNames = {"id", "name"};
+//        Pageable pageable = getPageable(start, length, columnNames, columnIndex, sortDir);
+//
+//        if (searchValue != null && !searchValue.isEmpty()) {
+//            pageRoles = roleService.searchRoles(searchValue, pageable);
+//        } else {
+//            pageRoles = roleService.findPaginated(pageable);
+//        }
+//
+//        int totalCount = roleService.countAllRoles();
+//        int currentPage = pageRoles.getNumber() + 1;
+//
+//        return getResponse(
+//                draw,
+//                totalCount,
+//                pageRoles.getTotalElements(),
+//                pageRoles.getContent(),
+//                currentPage,
+//                pageRoles.getTotalPages(),
+//                pageRoles.getNumberOfElements()
+//        );
+//    }
 
     private Pageable getPageable(int start, int length, String[] columnNames, int columnIndex, String sortDir) {
         String sortColumn = columnNames[columnIndex];

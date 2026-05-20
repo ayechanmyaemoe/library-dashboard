@@ -1,12 +1,17 @@
 package com.sip.book_shop.config;
 
+import com.sip.book_shop.handler.AuthenticationEntryPointHandler;
+import com.sip.book_shop.handler.CustomerAccessDeniedHandler;
 import com.sip.book_shop.handler.LoginFailureHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,9 +20,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -25,6 +32,15 @@ public class SecurityConfig {
 
     @Autowired
     private LoginFailureHandler loginFailureHandler;
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
+    @Autowired
+    private AuthenticationEntryPointHandler authenticationEntryPointHandler;
+
+    @Autowired
+    private CustomerAccessDeniedHandler customerAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,15 +52,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/", "/login", "/users/register", "/webjars/**", "/css/**", "/error/**").permitAll()
-                        .requestMatchers("/authors/add", "/books/add", "/authors/*/edit/**", "/books/*/edit/**", "/users/**", "/categories/**", "/roles/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/authors/*", "/books/*").hasRole("ADMIN")
+                        .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/welcome", true)
-                        .failureHandler(loginFailureHandler)
-                        .permitAll())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(authenticationEntryPointHandler)
+                                .accessDeniedHandler(customerAccessDeniedHandler))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -52,9 +65,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(1)
-                        .expiredUrl("/login?expired=true"));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
@@ -64,6 +75,11 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
 }

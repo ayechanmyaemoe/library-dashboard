@@ -1,5 +1,6 @@
 package com.sip.book_shop.mapper;
 
+import com.sip.book_shop.api.request.RoleRequest;
 import com.sip.book_shop.dto.RoleDto;
 import com.sip.book_shop.helper.MappingHelper;
 import com.sip.book_shop.model.Role;
@@ -13,4 +14,8 @@ public interface RoleMapper {
 
     @Mapping(target = "name", source = "name", qualifiedByName = "trimAndUpperCase")
     Role toEntity(RoleDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "name", qualifiedByName = "trimAndUpperCase")
+    Role toEntity(RoleRequest request);
 }

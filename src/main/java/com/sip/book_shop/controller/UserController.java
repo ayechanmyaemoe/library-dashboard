@@ -127,7 +127,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBook(@AuthenticationPrincipal UserDetailsImpl currentUser,
+    public String deleteUser(@AuthenticationPrincipal UserDetailsImpl currentUser,
                              @PathVariable int id,
                              RedirectAttributes redirectAttributes) {
         try {

@@ -15,6 +15,8 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
 
     Optional<Role> findByName(String name);
 
+    boolean existsByName(String name);
+
     @Query("select r from Role r where " +
             "lower(r.name) like lower(concat('%', :searchValue, '%'))")
     Page<Role> searchByKeyword(@Param("searchValue") String searchValue, Pageable pageable);

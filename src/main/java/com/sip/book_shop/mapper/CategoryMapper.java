@@ -1,5 +1,6 @@
 package com.sip.book_shop.mapper;
 
+import com.sip.book_shop.api.request.CategoryRequest;
 import com.sip.book_shop.dto.CategoryDto;
 import com.sip.book_shop.helper.MappingHelper;
 import com.sip.book_shop.model.Category;
@@ -13,4 +14,8 @@ public interface CategoryMapper {
 
     @Mapping(target = "name", source = "name", qualifiedByName = "trimString")
     Category toEntity(CategoryDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "name", qualifiedByName = "trimString")
+    Category toEntity(CategoryRequest request);
 }
