@@ -3,6 +3,7 @@ package com.sip.book_shop.api.service;
 import com.sip.book_shop.api.request.BookRequest;
 import com.sip.book_shop.api.response.BookResponse;
 import com.sip.book_shop.api.response.PageBookResponse;
+import com.sip.book_shop.api.response.SingleBookResponse;
 import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.exception.NotFoundException;
 import com.sip.book_shop.mapper.BookMapper;
@@ -10,6 +11,7 @@ import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.Category;
 import com.sip.book_shop.repository.BookRepository;
+import com.sip.book_shop.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +33,18 @@ public class BookApiService {
     @Autowired
     private BookMapper bookMapper;
 
-    public PageBookResponse getAll(int page, int size, String sortDir) {
+    public PageBookResponse getAll(int page, int size, String sortDir, String searchValue) {
+        Page<Book> books;
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
+        if(searchValue != null && !searchValue.isEmpty()) {
+            books = searchBooks(searchValue, pageable);
+        } else {
+            books = bookRepository.findAll(pageable);
+        }
+
         List<BookResponse> responseBooks = new ArrayList<>();
-        Page<Book> books = bookRepository.findAll(pageable);
         for(Book book: books) {
             responseBooks.add(bookMapper.toResponse(book));
         }
@@ -47,6 +55,11 @@ public class BookApiService {
                 .totalDataCount(bookRepository.findAll().size())
                 .books(responseBooks)
                 .build();
+    }
+
+    public SingleBookResponse getById(int id) {
+        Book book = getExistingBook(id);
+        return bookMapper.toSingleResponse(book);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -84,5 +97,9 @@ public class BookApiService {
     private Book getExistingBook(int id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("There is no book with such id."));
+    }
+
+    public Page<Book> searchBooks(String searchValue, Pageable pageable) {
+        return bookRepository.searchByKeyword(searchValue, pageable);
     }
 }

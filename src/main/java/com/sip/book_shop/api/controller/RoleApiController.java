@@ -5,6 +5,7 @@ import com.sip.book_shop.api.response.ApiResponse;
 import com.sip.book_shop.api.response.PageRoleResponse;
 import com.sip.book_shop.api.service.RoleApiService;
 import com.sip.book_shop.handler.ResponseHandler;
+import com.sip.book_shop.model.Category;
 import com.sip.book_shop.model.Role;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,15 @@ public class RoleApiController {
     @GetMapping
     public ResponseEntity<PageRoleResponse> getAllRoles(@RequestParam(defaultValue = "1") int page,
                                                         @RequestParam(defaultValue = "10") int size,
-                                                        @RequestParam(defaultValue = "asc") String sortDir) {
-        var response = roleApiService.getAll(page, size, sortDir);
+                                                        @RequestParam(defaultValue = "asc") String sortDir,
+                                                        @RequestParam(defaultValue = "") String searchValue) {
+        var response = roleApiService.getAll(page, size, sortDir, searchValue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Role> getRoleById(@PathVariable int id) {
+        var response = roleApiService.getById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

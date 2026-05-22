@@ -1,6 +1,7 @@
 package com.sip.book_shop.api.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -14,9 +15,9 @@ public class BookRequest {
     @Pattern(regexp = "^\\d{4}$", message = "{book.publishedYear.pattern}")
     private String publishedYear;
 
-    @NotBlank(message = "{book.author.blank}")
-    private String author;
+    @NotNull(message = "{book.author.blank}")
+    private int authorId;
 
-    @NotBlank(message = "{book.category.blank}")
-    private String category;
+    @NotNull(message = "{book.category.blank}")
+    private int categoryId;
 }

@@ -7,6 +7,7 @@ import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.exception.NotAllowedException;
 import com.sip.book_shop.exception.NotFoundException;
 import com.sip.book_shop.mapper.RoleMapper;
+import com.sip.book_shop.model.Category;
 import com.sip.book_shop.model.Role;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.RoleRepository;
@@ -36,12 +37,18 @@ public class RoleApiService {
     private RoleMapper roleMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public PageRoleResponse getAll(int page, int size, String sortDir) {
+    public PageRoleResponse getAll(int page, int size, String sortDir, String searchValue) {
+        Page<Role> roles;
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
+        if(searchValue != null && !searchValue.isEmpty()) {
+            roles = searchRoles(searchValue, pageable);
+        } else {
+            roles = roleRepository.findAll(pageable);
+        }
+
         List<Role> responseRoles = new ArrayList<>();
-        Page<Role> roles = roleRepository.findAll(pageable);
         for(Role role: roles) {
             responseRoles.add(role);
         }
@@ -53,6 +60,11 @@ public class RoleApiService {
                 .totalDataCount(allRoles.size())
                 .roles(responseRoles)
                 .build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Role getById(int id) {
+        return getExistingRole(id);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -93,5 +105,9 @@ public class RoleApiService {
     private Role getExistingRole(int id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("There is no role with such id."));
+    }
+
+    public Page<Role> searchRoles(String searchValue, Pageable pageable) {
+        return roleRepository.searchByKeyword(searchValue, pageable);
     }
 }

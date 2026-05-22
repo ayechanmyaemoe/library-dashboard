@@ -45,9 +45,9 @@ public class MappingHelper {
                 .orElseThrow(() -> new IllegalArgumentException("Role not found!"));
     }
 
-    @Named("roleStrToObject")
-    public Role roleStrToObject(String roleStr) {
-        return roleRepository.findByName(roleStr)
+    @Named("roleIdToObject")
+    public Role roleIdToObject(int roleId) {
+        return roleRepository.findById(roleId)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found!"));
     }
 
@@ -64,15 +64,15 @@ public class MappingHelper {
         return birthDate;
     }
 
-    @Named("authorStrToObject")
-    public Author authorStrToObject(String authorStr) {
-        return authorRepository.findByName(authorStr)
+    @Named("authorIdToObject")
+    public Author authorIdToObject(int authorId) {
+        return authorRepository.findById(authorId)
                 .orElseThrow(() -> new IllegalArgumentException("Author not found!"));
     }
 
-    @Named("categoryStrToObject")
-    public Category categoryStrToObject(String categoryStr) {
-        return categoryRepository.findByName(categoryStr)
+    @Named("categoryIdToObject")
+    public Category categoryIdToObject(int categoryId) {
+        return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found!"));
     }
 

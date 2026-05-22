@@ -2,6 +2,7 @@ package com.sip.book_shop.api.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -17,6 +18,6 @@ public class AddUserInfoRequest {
     @NotBlank(message = "{user.password.blank}")
     private String password;
 
-    @NotBlank(message = "{user.role.blank}")
-    private String role;
+    @NotNull(message = "{user.role.blank}")
+    private int roleId;
 }

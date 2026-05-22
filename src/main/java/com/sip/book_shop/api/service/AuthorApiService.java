@@ -3,6 +3,7 @@ package com.sip.book_shop.api.service;
 import com.sip.book_shop.api.request.AuthorRequest;
 import com.sip.book_shop.api.response.PageAuthorResponse;
 import com.sip.book_shop.api.response.PageCategoryResponse;
+import com.sip.book_shop.api.response.SingleBookResponse;
 import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.exception.NotAllowedException;
 import com.sip.book_shop.exception.NotFoundException;
@@ -36,23 +37,32 @@ public class AuthorApiService {
     @Autowired
     private AuthorMapper authorMapper;
 
-    public PageAuthorResponse getAll(int page, int size, String sortDir) {
+    public PageAuthorResponse getAll(int page, int size, String sortDir, String searchValue) {
+        Page<Author> authors;
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
+        if(searchValue != null && !searchValue.isEmpty()) {
+            authors = searchAuthors(searchValue, pageable);
+        } else {
+            authors = authorRepository.findAll(pageable);
+        }
+
         List<Author> responseAuthors = new ArrayList<>();
-        Page<Author> authors = authorRepository.findAll(pageable);
         for(Author author: authors) {
             responseAuthors.add(author);
         }
 
-        List<Author> allAuthors = authorRepository.findAll();
         return PageAuthorResponse.builder()
                 .page(page)
                 .totalPage(authors.getTotalPages())
-                .totalDataCount(allAuthors.size())
+                .totalDataCount(authorRepository.findAll().size())
                 .authors(responseAuthors)
                 .build();
+    }
+
+    public Author getById(int id) {
+        return getExistingAuthor(id);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -93,5 +103,9 @@ public class AuthorApiService {
     private Author getExistingAuthor(int id) {
         return authorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("There is no author with such id."));
+    }
+
+    public Page<Author> searchAuthors(String searchValue, Pageable pageable) {
+        return authorRepository.searchByKeyword(searchValue, pageable);
     }
 }

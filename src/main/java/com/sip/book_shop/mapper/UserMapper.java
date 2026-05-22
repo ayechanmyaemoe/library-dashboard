@@ -4,6 +4,7 @@ import com.sip.book_shop.api.request.AddUserInfoRequest;
 import com.sip.book_shop.api.request.ChangePasswordRequest;
 import com.sip.book_shop.api.request.RegisterInfoRequest;
 import com.sip.book_shop.api.request.UpdateUserRequest;
+import com.sip.book_shop.api.response.SingleUserResponse;
 import com.sip.book_shop.api.response.UserResponse;
 import com.sip.book_shop.dto.ChangePasswordDto;
 import com.sip.book_shop.dto.UserDto;
@@ -32,7 +33,7 @@ public interface UserMapper {
     @Mapping(target = "password", source = "password", qualifiedByName = "trimString")
     @Mapping(target = "email", source = "email", qualifiedByName = "trimString")
     @Mapping(target = "enabled", constant = "true")
-    @Mapping(target = "role", source = "role", qualifiedByName = "roleStrToObject")
+    @Mapping(target = "role", source = "roleId", qualifiedByName = "roleIdToObject")
     User toEntity(AddUserInfoRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -49,6 +50,8 @@ public interface UserMapper {
 
     @Mapping(target = "username", source = "username", qualifiedByName = "trimString")
     @Mapping(target = "email", source = "email", qualifiedByName = "trimString")
-    @Mapping(target = "role", source = "role", qualifiedByName = "roleStrToObject")
+    @Mapping(target = "role", source = "roleId", qualifiedByName = "roleIdToObject")
     User toEntity(UpdateUserRequest request);
+
+    SingleUserResponse toSingleResponse(User entity);
 }

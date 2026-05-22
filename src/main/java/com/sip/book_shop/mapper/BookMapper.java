@@ -2,6 +2,7 @@ package com.sip.book_shop.mapper;
 
 import com.sip.book_shop.api.request.BookRequest;
 import com.sip.book_shop.api.response.BookResponse;
+import com.sip.book_shop.api.response.SingleBookResponse;
 import com.sip.book_shop.dto.BookDto;
 import com.sip.book_shop.helper.MappingHelper;
 import com.sip.book_shop.model.Book;
@@ -20,11 +21,13 @@ public interface BookMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "title", source = "title", qualifiedByName = "trimString")
-    @Mapping(target = "author", source = "author", qualifiedByName = "authorStrToObject")
-    @Mapping(target = "category", source = "category", qualifiedByName = "categoryStrToObject")
+    @Mapping(target = "author", source = "authorId", qualifiedByName = "authorIdToObject")
+    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToObject")
     Book toEntity(BookRequest request);
 
     @Mapping(target = "author", source = "author", qualifiedByName = "ObjToAuthorStr")
     @Mapping(target = "category", source = "category", qualifiedByName = "ObjToCategoryStr")
     BookResponse toResponse(Book entity);
+
+    SingleBookResponse toSingleResponse(Book entity);
 }

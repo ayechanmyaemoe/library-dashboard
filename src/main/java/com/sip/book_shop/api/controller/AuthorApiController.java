@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/authors")
 public class AuthorApiController {
@@ -24,8 +22,15 @@ public class AuthorApiController {
     @GetMapping
     public ResponseEntity<PageAuthorResponse> getAllAuthors(@RequestParam(defaultValue = "1") int page,
                                                             @RequestParam(defaultValue = "10") int size,
-                                                            @RequestParam(defaultValue = "asc") String sortDir) {
-        var response = authorApiService.getAll(page, size, sortDir);
+                                                            @RequestParam(defaultValue = "asc") String sortDir,
+                                                            @RequestParam(defaultValue = "") String searchValue) {
+        var response = authorApiService.getAll(page, size, sortDir, searchValue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Author> getAuthorById(@PathVariable int id) {
+        var response = authorApiService.getById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

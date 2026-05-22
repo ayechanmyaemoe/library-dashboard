@@ -6,6 +6,7 @@ import com.sip.book_shop.exception.AlreadyExistsException;
 import com.sip.book_shop.exception.NotAllowedException;
 import com.sip.book_shop.exception.NotFoundException;
 import com.sip.book_shop.mapper.CategoryMapper;
+import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Book;
 import com.sip.book_shop.model.Category;
 import com.sip.book_shop.repository.BookRepository;
@@ -35,12 +36,18 @@ public class CategoryApiService {
     private CategoryMapper categoryMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public PageCategoryResponse getAll(int page, int size, String sortDir) {
+    public PageCategoryResponse getAll(int page, int size, String sortDir, String searchValue) {
+        Page<Category> categories;
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
+        if(searchValue != null && !searchValue.isEmpty()) {
+            categories = searchCategories(searchValue, pageable);
+        } else {
+            categories = categoryRepository.findAll(pageable);
+        }
+
         List<Category> responseCategories = new ArrayList<>();
-        Page<Category> categories = categoryRepository.findAll(pageable);
         for(Category category: categories) {
             responseCategories.add(category);
         }
@@ -52,6 +59,11 @@ public class CategoryApiService {
                 .totalDataCount(allCategories.size())
                 .categories(responseCategories)
                 .build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Category getById(int id) {
+        return getExistingCategory(id);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -92,5 +104,9 @@ public class CategoryApiService {
     private Category getExistingCategory(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("There is no category with such id."));
+    }
+
+    public Page<Category> searchCategories(String searchValue, Pageable pageable) {
+        return categoryRepository.searchByKeyword(searchValue, pageable);
     }
 }

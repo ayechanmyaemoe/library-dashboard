@@ -5,6 +5,7 @@ import com.sip.book_shop.api.response.ApiResponse;
 import com.sip.book_shop.api.response.PageCategoryResponse;
 import com.sip.book_shop.api.service.CategoryApiService;
 import com.sip.book_shop.handler.ResponseHandler;
+import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.Category;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,15 @@ public class CategoryApiController {
     @GetMapping
     public ResponseEntity<PageCategoryResponse> getAllCategories(@RequestParam(defaultValue = "1") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(defaultValue = "asc") String sortDir) {
-        var response = categoryApiService.getAll(page, size, sortDir);
+                                                                 @RequestParam(defaultValue = "asc") String sortDir,
+                                                                 @RequestParam(defaultValue = "") String searchValue) {
+        var response = categoryApiService.getAll(page, size, sortDir, searchValue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
+        var response = categoryApiService.getById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

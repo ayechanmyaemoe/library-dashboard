@@ -5,6 +5,7 @@ import com.sip.book_shop.api.request.ChangePasswordRequest;
 import com.sip.book_shop.api.request.RegisterInfoRequest;
 import com.sip.book_shop.api.request.UpdateUserRequest;
 import com.sip.book_shop.api.response.PageUserResponse;
+import com.sip.book_shop.api.response.SingleUserResponse;
 import com.sip.book_shop.api.response.UserResponse;
 import com.sip.book_shop.config.JwtService;
 import com.sip.book_shop.exception.AlreadyExistsException;
@@ -12,6 +13,7 @@ import com.sip.book_shop.exception.MisMatchException;
 import com.sip.book_shop.exception.NotAllowedException;
 import com.sip.book_shop.exception.NotFoundException;
 import com.sip.book_shop.mapper.UserMapper;
+import com.sip.book_shop.model.Author;
 import com.sip.book_shop.model.User;
 import com.sip.book_shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,12 +66,18 @@ public class UserApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public PageUserResponse getAll(int page, int size, String sortDir) {
+    public PageUserResponse getAll(int page, int size, String sortDir, String searchValue) {
+        Page<User> users;
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
+        if(searchValue != null && !searchValue.isEmpty()) {
+            users = searchUsers(searchValue, pageable);
+        } else {
+            users = userRepository.findAll(pageable);
+        }
+
         List<UserResponse> responseUsers = new ArrayList<>();
-        Page<User> users = userRepository.findAll(pageable);
         for(User user: users) {
             responseUsers.add(userMapper.toResponse(user));
         }
@@ -80,6 +88,12 @@ public class UserApiService {
                 .totalDataCount(userRepository.findAll().size())
                 .users(responseUsers)
                 .build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public SingleUserResponse getById(int id) {
+        User user = getExistingUser(id);
+        return userMapper.toSingleResponse(user);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -154,6 +168,10 @@ public class UserApiService {
         if(sameEmailUser != null) {
             throw new AlreadyExistsException("Email already registered!");
         }
+    }
+
+    public Page<User> searchUsers(String searchValue, Pageable pageable) {
+        return userRepository.searchByKeyword(searchValue, pageable);
     }
 
 }

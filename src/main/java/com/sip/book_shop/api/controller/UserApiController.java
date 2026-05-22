@@ -3,9 +3,11 @@ package com.sip.book_shop.api.controller;
 import com.sip.book_shop.api.request.*;
 import com.sip.book_shop.api.response.ApiResponse;
 import com.sip.book_shop.api.response.PageUserResponse;
+import com.sip.book_shop.api.response.SingleUserResponse;
 import com.sip.book_shop.api.response.UserResponse;
 import com.sip.book_shop.api.service.UserApiService;
 import com.sip.book_shop.handler.ResponseHandler;
+import com.sip.book_shop.model.Author;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -22,7 +24,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:4200")
 public class UserApiController {
 
     @Autowired
@@ -55,8 +56,15 @@ public class UserApiController {
     @GetMapping
     public ResponseEntity<PageUserResponse> getAllUsers(@RequestParam(defaultValue = "1") int page,
                                                         @RequestParam(defaultValue = "10") int size,
-                                                        @RequestParam(defaultValue = "asc") String sortDir) {
-        var response = userApiService.getAll(page, size, sortDir);
+                                                        @RequestParam(defaultValue = "asc") String sortDir,
+                                                        @RequestParam(defaultValue = "") String searchValue) {
+        var response = userApiService.getAll(page, size, sortDir, searchValue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SingleUserResponse> getUserById(@PathVariable int id) {
+        var response = userApiService.getById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

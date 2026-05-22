@@ -5,6 +5,7 @@ import com.sip.book_shop.api.request.BookRequest;
 import com.sip.book_shop.api.response.ApiResponse;
 import com.sip.book_shop.api.response.BookResponse;
 import com.sip.book_shop.api.response.PageBookResponse;
+import com.sip.book_shop.api.response.SingleBookResponse;
 import com.sip.book_shop.api.service.BookApiService;
 import com.sip.book_shop.handler.ResponseHandler;
 import com.sip.book_shop.model.Author;
@@ -27,8 +28,15 @@ public class BookApiController {
     @GetMapping
     public ResponseEntity<PageBookResponse> getAllBooks(@RequestParam(defaultValue = "1") int page,
                                                         @RequestParam(defaultValue = "10") int size,
-                                                        @RequestParam(defaultValue = "asc") String sortDir) {
-        var response = bookApiService.getAll(page, size, sortDir);
+                                                        @RequestParam(defaultValue = "asc") String sortDir,
+                                                        @RequestParam(defaultValue = "") String searchValue) {
+        var response = bookApiService.getAll(page, size, sortDir, searchValue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SingleBookResponse> getBookById(@PathVariable int id) {
+        var response = bookApiService.getById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
