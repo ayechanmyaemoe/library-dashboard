@@ -16,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,17 +59,17 @@ public class CategoryApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void addNew(CategoryDTO request) {
+    public void addNew(CategoryDTO request) throws BindException {
         Category category = categoryMapper.toEntity(request);
-        checkExistCategory(request.getName());
+        checkExistCategory(request);
         categoryRepository.save(category);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void update(CategoryDTO request, int id) {
+    public void update(CategoryDTO request, int id) throws BindException {
         Category existingCategory = getExistingCategory(id);
-        if(!Objects.equals(request.getName(), existingCategory.getName())) {
-            checkExistCategory(request.getName());
+        if(!Objects.equals(request.getName().toLowerCase(), existingCategory.getName().toLowerCase())) {
+            checkExistCategory(request);
         }
         Category category = categoryMapper.toEntity(request);
         category.setId(existingCategory.getId());
@@ -83,10 +86,12 @@ public class CategoryApiService {
         categoryRepository.deleteById(existingCategory.getId());
     }
 
-    private void checkExistCategory(String name) {
-        var category = categoryRepository.findByName(name);
+    private void checkExistCategory(CategoryDTO request) throws BindException {
+        var category = categoryRepository.findByName(request.getName());
         if(category.isPresent()) {
-            throw new AlreadyExistsException("Category already existed!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, "categoryDTO");
+            bindingResult.rejectValue("name", "duplicate", "Category already existed!");
+            throw new BindException(bindingResult);
         }
     }
 

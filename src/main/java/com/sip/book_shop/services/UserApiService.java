@@ -6,7 +6,6 @@ import com.sip.book_shop.dto.mapper.UserMapper;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
 import com.sip.book_shop.security.authentication.AuthProvider;
 import com.sip.book_shop.vo.*;
-import com.sip.book_shop.common.exceptions.AlreadyExistsException;
 import com.sip.book_shop.common.exceptions.MisMatchException;
 import com.sip.book_shop.common.exceptions.NotAllowedException;
 import com.sip.book_shop.common.exceptions.NotFoundException;
@@ -21,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 
 import java.util.*;
 
@@ -39,16 +40,16 @@ public class UserApiService {
     @Autowired
     private UserMapper userMapper;
 
-    public void register(RegisterUserRequest request) {
+    public void register(RegisterUserRequest request) throws BindException {
         User user = userMapper.toEntity(request);
-        checkConflict(user.getUsername(), user.getEmail());
+        checkConflict(request, "registerUserRequest", request.getUsername(), request.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
-    public void addNew(AddUserRequest request) {
+    public void addNew(AddUserRequest request) throws BindException {
         User user = userMapper.toEntity(request);
-        checkConflict(user.getUsername(), user.getEmail());
+        checkConflict(request, "addUserRequest", request.getUsername(), request.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -83,13 +84,13 @@ public class UserApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void update(int id, UpdateUserRequest request) {
+    public void update(int id, UpdateUserRequest request) throws BindException {
         User updateUser = userMapper.toEntity(request);
         User existingUser = getExistingUser(id);
         if(!Objects.equals(existingUser.getUsername(), updateUser.getUsername())) {
-            checkUsername(updateUser.getUsername());
+            checkUsername(request, "updateUserRequest", request.getUsername());
         } else if(!Objects.equals(existingUser.getEmail(), updateUser.getEmail())) {
-            checkEmail(updateUser.getEmail());
+            checkEmail(request, "updateUserRequest", request.getEmail());
         }
         updateUser.setId(id);
         updateUser.setPassword(existingUser.getPassword());
@@ -117,10 +118,12 @@ public class UserApiService {
         userRepository.deleteById(existingUser.getId());
     }
 
-    public void changePassword(ChangePasswordInput request, int id) {
+    public void changePassword(ChangePasswordRequest request, int id) throws BindException {
         User existingUser = getExistingUser(id);
         if(!passwordEncoder.matches(request.getOldPassword().trim(), existingUser.getPassword())) {
-            throw new MisMatchException("Invalid old password!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, "changePasswordRequest");
+            bindingResult.rejectValue("oldPassword", "invalid", "Invalid old password!");
+            throw new BindException(bindingResult);
         }
         User updateUser = new User();
         updateUser.setPassword(passwordEncoder.encode(request.getNewPassword().trim()));
@@ -136,23 +139,27 @@ public class UserApiService {
                 .orElseThrow(() -> new NotFoundException("There is no user with such id."));
     }
 
-    private void checkConflict(String username, String email) {
-        checkUsername(username);
+    private void checkConflict(Object target, String objectName, String username, String email) throws BindException {
+        checkUsername(target, objectName, username);
 
-        checkEmail(email);
+        checkEmail(target, objectName, email);
     }
 
-    private void checkUsername(String username) {
+    private void checkUsername(Object request, String objectName, String username) throws BindException {
         User sameUser = userRepository.findByUsername(username);
         if(sameUser != null) {
-            throw new AlreadyExistsException("Username already existed!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, objectName);
+            bindingResult.rejectValue("username", "duplicate", "Username already existed!");
+            throw new BindException(bindingResult);
         }
     }
 
-    private void checkEmail(String email) {
+    private void checkEmail(Object request, String objectName, String email) throws BindException {
         User sameEmailUser = userRepository.findByEmail(email);
         if(sameEmailUser != null) {
-            throw new AlreadyExistsException("Email already registered!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, objectName);
+            bindingResult.rejectValue("email", "duplicate", "Email already existed!");
+            throw new BindException(bindingResult);
         }
     }
 

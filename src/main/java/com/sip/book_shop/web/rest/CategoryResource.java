@@ -10,6 +10,7 @@ import com.sip.book_shop.services.CategoryApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,14 +33,14 @@ public class CategoryResource implements BaseResource<ApiResponse<DataTableOutpu
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> create(CategoryDTO request) {
+    public ResponseEntity<ApiResponse<Void>> create(CategoryDTO request) throws BindException {
         categoryApiService.addNew(request);
         ApiResponse<Void> responseBody = ApiResponse.created("Created category successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> update(CategoryDTO request, int id) {
+    public ResponseEntity<ApiResponse<Void>> update(CategoryDTO request, int id) throws BindException {
         categoryApiService.update(request, id);
         return ResponseEntity.ok(ApiResponse.success("Updated category successfully!"));
     }

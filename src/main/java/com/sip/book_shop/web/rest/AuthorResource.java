@@ -10,6 +10,7 @@ import com.sip.book_shop.services.AuthorApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,14 +33,14 @@ public class AuthorResource implements BaseResource<ApiResponse<DataTableOutput<
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> create(AuthorDTO request) {
+    public ResponseEntity<ApiResponse<Void>> create(AuthorDTO request) throws BindException {
         authorApiService.addNew(request);
         ApiResponse<Void> responseBody = ApiResponse.created("Created author successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> update(AuthorDTO request, int id) {
+    public ResponseEntity<ApiResponse<Void>> update(AuthorDTO request, int id) throws BindException {
         authorApiService.update(request, id);
         return ResponseEntity.ok(ApiResponse.success("Updated author successfully!"));
     }

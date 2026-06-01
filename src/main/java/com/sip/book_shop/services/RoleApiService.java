@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,17 +57,17 @@ public class RoleApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void addNew(RoleDTO request) {
+    public void addNew(RoleDTO request) throws BindException {
         Role role = roleMapper.toEntity(request);
-        checkRoleExists(role.getName());
+        checkRoleExists(request);
         roleRepository.save(role);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void update(RoleDTO request, int id) {
+    public void update(RoleDTO request, int id) throws BindException {
         Role existingRole = getExistingRole(id);
         if(!Objects.equals(existingRole.getName(), request.getName().toUpperCase().trim())) {
-            checkRoleExists(request.getName().trim());
+            checkRoleExists(request);
         }
         Role role = roleMapper.toEntity(request);
         role.setId(id);
@@ -82,10 +84,12 @@ public class RoleApiService {
         roleRepository.deleteById(existingRole.getId());
     }
 
-    private void checkRoleExists(String name) {
-        boolean isExists = roleRepository.existsByName(name);
+    private void checkRoleExists(RoleDTO request) throws BindException {
+        boolean isExists = roleRepository.existsByName(request.getName().trim());
         if(isExists) {
-            throw new AlreadyExistsException("Role already existed!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, "roleDTO");
+            bindingResult.rejectValue("name", "duplicate", "Role already existed!");
+            throw new BindException(bindingResult);
         }
     }
 

@@ -16,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,24 +32,11 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
     private UserApiService userApiService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterUserRequest request) {
+    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterUserRequest request) throws BindException {
         userApiService.register(request);
         ApiResponse<Void> responseBody = ApiResponse.created("Registered user successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<ApiResponse<Map<String, String>>> login(@Valid @RequestBody LoginRequest request) {
-//        try {
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-//            );
-//            var tokenData = userApiService.getLoginData(request.getUsername());
-//            return ResponseEntity.ok(ApiResponse.success("logged in successfully!", tokenData));
-//        } catch (BadCredentialsException | UsernameNotFoundException e) {
-//            throw new BadCredentialsException("Invalid username or password!");
-//        }
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, String>>> login(@Valid @RequestBody LoginRequest request) {
@@ -76,21 +64,21 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> create(AddUserRequest request) {
+    public ResponseEntity<ApiResponse<Void>> create(AddUserRequest request) throws BindException {
         userApiService.addNew(request);
         ApiResponse<Void> responseBody = ApiResponse.created("Created user successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> update(UpdateUserRequest request, int id) {
+    public ResponseEntity<ApiResponse<Void>> update(UpdateUserRequest request, int id) throws BindException {
         userApiService.update(id, request);
         return ResponseEntity.ok(ApiResponse.success("Updated user successfully!"));
     }
 
     @PutMapping("/{id}/change-password")
     public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable int id,
-                                                            @Valid @RequestBody ChangePasswordInput request) {
+                                                            @Valid @RequestBody ChangePasswordRequest request) throws BindException {
         userApiService.changePassword(request, id);
         return ResponseEntity.ok(ApiResponse.success("Updated password successfully!"));
     }

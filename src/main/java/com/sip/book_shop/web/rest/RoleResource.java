@@ -10,6 +10,7 @@ import com.sip.book_shop.services.RoleApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,14 +33,14 @@ public class RoleResource implements BaseResource<ApiResponse<DataTableOutput<Ro
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> create(RoleDTO request) {
+    public ResponseEntity<ApiResponse<Void>> create(RoleDTO request) throws BindException {
         roleApiService.addNew(request);
         ApiResponse<Void> responseBody = ApiResponse.created("Created role successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> update(RoleDTO request, int id) {
+    public ResponseEntity<ApiResponse<Void>> update(RoleDTO request, int id) throws BindException {
         roleApiService.update(request, id);
         return ResponseEntity.ok(ApiResponse.success("Updated role successfully!"));
     }

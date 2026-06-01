@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,17 +56,17 @@ public class AuthorApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void addNew(AuthorDTO request) {
-        checkExistAuthor(request.getName());
+    public void addNew(AuthorDTO request) throws BindException {
+        checkExistAuthor(request);
         Author author = authorMapper.toEntity(request);
         authorRepository.save(author);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void update(AuthorDTO request, int id) {
+    public void update(AuthorDTO request, int id) throws BindException {
         Author existingAuthor = getExistingAuthor(id);
         if(!Objects.equals(existingAuthor.getName(), request.getName())) {
-            checkExistAuthor(request.getName());
+            checkExistAuthor(request);
         }
         Author author = authorMapper.toEntity(request);
         author.setId(existingAuthor.getId());
@@ -81,10 +83,12 @@ public class AuthorApiService {
         authorRepository.deleteById(existingAuthor.getId());
     }
 
-    private void checkExistAuthor(String name) {
-        var author = authorRepository.findByName(name);
+    private void checkExistAuthor(AuthorDTO request) throws BindException {
+        var author = authorRepository.findByName(request.getName());
         if(author.isPresent()) {
-            throw new AlreadyExistsException("Author already existed!");
+            BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(request, "authorDTO");
+            bindingResult.rejectValue("name", "duplicate", "Author already existed!");
+            throw new BindException(bindingResult);
         }
     }
 
