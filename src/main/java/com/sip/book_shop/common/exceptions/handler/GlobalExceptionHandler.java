@@ -1,10 +1,7 @@
 package com.sip.book_shop.common.exceptions.handler;
 
+import com.sip.book_shop.common.exceptions.*;
 import com.sip.book_shop.vo.ApiResponse;
-import com.sip.book_shop.common.exceptions.AlreadyExistsException;
-import com.sip.book_shop.common.exceptions.MisMatchException;
-import com.sip.book_shop.common.exceptions.NotAllowedException;
-import com.sip.book_shop.common.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -29,6 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleUserNotFoundException(NotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.notFound(e.getMessage()));
+    }
+
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInternalServerException(InternalServerException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.badRequest(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -23,4 +23,7 @@ public interface BaseResource<P, S, I, U> {
 
     @DeleteMapping("/{id}")
     ResponseEntity<ApiResponse<Void>> delete(@PathVariable int id);
+
+    @GetMapping("/export")
+    ResponseEntity<byte[]> generateExcel();
 }

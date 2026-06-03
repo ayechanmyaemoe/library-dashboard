@@ -42,6 +42,15 @@ public class BookApiService {
         return responseBooks;
     }
 
+    public List<BookDTO> getAll() {
+        List<BookDTO> bookDTOs = new ArrayList<>();
+        List<Book> books = bookRepository.findAll();
+        for(Book book: books) {
+            bookDTOs.add(bookMapper.toDto(book));
+        }
+        return bookDTOs;
+    }
+
     public long count() {
         return bookRepository.count();
     }

@@ -3,6 +3,7 @@ package com.sip.book_shop.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sip.book_shop.common.excel.query.ExcelColumn;
 import com.sip.book_shop.constant.Constant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,11 +18,14 @@ import java.time.LocalDate;
 @JsonPropertyOrder({"id", "name", "birthDate"})
 public class AuthorDTO {
 
+    @ExcelColumn(index = 0, name = "ID")
     public Integer id;
 
+    @ExcelColumn(index = 1, name = "Name")
     @NotBlank(message = "{author.name.blank}")
     public String name;
 
+    @ExcelColumn(index = 2, name = "Birthdate")
     @NotNull(message = "{author.birthDate.null}")
     @Past(message = "{author.birthDate.past}")
     @DateTimeFormat(pattern = Constant.DB_DATE_FORMAT)

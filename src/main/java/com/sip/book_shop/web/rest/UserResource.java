@@ -1,5 +1,6 @@
 package com.sip.book_shop.web.rest;
 
+import com.sip.book_shop.common.excel.ExcelGenerator;
 import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.dto.UserDTO;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
@@ -9,7 +10,9 @@ import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.UserApiService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -87,5 +91,16 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
     public ResponseEntity<ApiResponse<Void>> delete(int id) {
         userApiService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Deleted user successfully!"));
+    }
+
+    @Override
+    public ResponseEntity<byte[]> generateExcel() {
+        List<UserDTO> users = userApiService.getAll();
+        byte[] excelContent = ExcelGenerator.generate(users, UserDTO.class);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        httpHeaders.setContentDispositionFormData("attachment", "user_export.xlsx");
+        return ResponseEntity.ok().headers(httpHeaders).body(excelContent);
     }
 }

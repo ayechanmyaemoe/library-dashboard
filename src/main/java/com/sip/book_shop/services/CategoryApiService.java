@@ -49,8 +49,18 @@ public class CategoryApiService {
         return responseCategories;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<CategoryDTO> getAll() {
+        List<CategoryDTO> categoryDTOs = new ArrayList<>();
+        List<Category>  categories = categoryRepository.findAll();
+        for(Category category: categories) {
+            categoryDTOs.add(categoryMapper.toDto(category));
+        }
+        return categoryDTOs;
+    }
+
     public long count() {
-        return bookRepository.count();
+        return categoryRepository.count();
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

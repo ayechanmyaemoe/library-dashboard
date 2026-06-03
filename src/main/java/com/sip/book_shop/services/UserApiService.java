@@ -74,6 +74,16 @@ public class UserApiService {
         return responseRoles;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<UserDTO> getAll() {
+        List<UserDTO> userDTOs = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+        for(User user: users) {
+            userDTOs.add(userMapper.toDto(user));
+        }
+        return userDTOs;
+    }
+
     public long count() {
         return userRepository.count();
     }

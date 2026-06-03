@@ -1,5 +1,6 @@
 package com.sip.book_shop.web.rest;
 
+import com.sip.book_shop.common.excel.ExcelGenerator;
 import com.sip.book_shop.dto.AuthorDTO;
 import com.sip.book_shop.entities.queryCriteria.AuthorQueryCriteria;
 import com.sip.book_shop.vo.ApiResponse;
@@ -8,10 +9,14 @@ import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.AuthorApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -49,5 +54,16 @@ public class AuthorResource implements BaseResource<ApiResponse<DataTableOutput<
     public ResponseEntity<ApiResponse<Void>> delete(int id) {
         authorApiService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Deleted author successfully!"));
+    }
+
+    @Override
+    public ResponseEntity<byte[]> generateExcel() {
+        List<AuthorDTO> authors = authorApiService.getAll();
+        byte[] excelContent = ExcelGenerator.generate(authors, AuthorDTO.class);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        httpHeaders.setContentDispositionFormData("attachment", "author_export.xlsx");
+        return ResponseEntity.ok().headers(httpHeaders).body(excelContent);
     }
 }

@@ -35,6 +35,7 @@ public class RoleApiService {
     @Autowired
     private RoleMapper roleMapper;
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<RoleDTO> getAllResult(RoleQueryCriteria criteria) {
         Specification<Role> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Role> pageBooks = roleRepository.findAll(specification, criteria.getPageable());
@@ -45,6 +46,16 @@ public class RoleApiService {
         }
 
         return responseRoles;
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<RoleDTO> getAll() {
+        List<RoleDTO> roleDTOs = new ArrayList<>();
+        List<Role> roles = roleRepository.findAll();
+        for(Role role: roles) {
+            roleDTOs.add(roleMapper.toDto(role));
+        }
+        return roleDTOs;
     }
 
     public long count() {

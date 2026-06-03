@@ -47,6 +47,15 @@ public class AuthorApiService {
         return responseAuthors;
     }
 
+    public List<AuthorDTO> getAll() {
+        List<AuthorDTO> authorDTOs = new ArrayList<>();
+        List<Author> authors = authorRepository.findAll();
+        for(Author author: authors) {
+            authorDTOs.add(authorMapper.toDto(author));
+        }
+        return authorDTOs;
+    }
+
     public long count() {
         return authorRepository.count();
     }
