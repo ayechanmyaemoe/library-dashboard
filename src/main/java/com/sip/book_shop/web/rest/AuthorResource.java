@@ -28,7 +28,7 @@ public class AuthorResource implements BaseResource<ApiResponse<DataTableOutput<
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<AuthorDTO>>> findAll(NzDataTableInput dataTableInput) {
         AuthorQueryCriteria criteria = AuthorQueryCriteria.createAuthorQueryCriteria(dataTableInput);
-        DataTableOutput<AuthorDTO> dataTableOutput = DataTableOutput.of(authorApiService.findAll(criteria), authorApiService.count());
+        DataTableOutput<AuthorDTO> dataTableOutput = DataTableOutput.of(authorApiService.findAll(criteria));
         return ResponseEntity.ok(ApiResponse.success(dataTableOutput));
     }
 

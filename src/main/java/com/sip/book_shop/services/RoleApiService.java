@@ -13,6 +13,7 @@ import com.sip.book_shop.repositories.RoleRepository;
 import com.sip.book_shop.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -36,16 +37,14 @@ public class RoleApiService {
     private RoleMapper roleMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public List<RoleDTO> getAllResult(RoleQueryCriteria criteria) {
+    public Page<RoleDTO> getAllResult(RoleQueryCriteria criteria) {
         Specification<Role> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Role> pageBooks = roleRepository.findAll(specification, criteria.getPageable());
 
-        List<RoleDTO> responseRoles = new ArrayList<>();
-        for(Role role: pageBooks) {
-            responseRoles.add(roleMapper.toDto(role));
-        }
+        List<RoleDTO> responseRoles = pageBooks.stream().map(roleMapper::toDto)
+                .toList();
 
-        return responseRoles;
+        return new PageImpl<>(responseRoles, pageBooks.getPageable(), pageBooks.getTotalElements());
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

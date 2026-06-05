@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sip.book_shop.common.query.annotations.Query;
+import com.sip.book_shop.common.query.enums.Type;
 import com.sip.book_shop.common.utils.ObjectUtils;
 import com.sip.book_shop.common.vo.NzDataTableInput;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ public class UserQueryCriteria {
 
     @Query(blurry = "username, email")
     private String blurry;
+
+    @Query(type = Type.EQUAL, joinName = "role", propName = "name")
+    private String role;
 
     private Pageable pageable;
 

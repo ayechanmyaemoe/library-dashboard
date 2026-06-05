@@ -1,5 +1,6 @@
 package com.sip.book_shop.common.exceptions.handler;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.sip.book_shop.common.exceptions.*;
 import com.sip.book_shop.vo.ApiResponse;
 import org.springframework.http.HttpStatus;
@@ -72,6 +73,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MisMatchException.class)
     public ResponseEntity<ApiResponse<Void>> handleMisMatchException(MisMatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.badRequest(e.getMessage()));
+    }
+
+    @ExceptionHandler(MismatchedInputException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMisMatchInputException(MismatchedInputException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.badRequest(e.getMessage()));
     }
 

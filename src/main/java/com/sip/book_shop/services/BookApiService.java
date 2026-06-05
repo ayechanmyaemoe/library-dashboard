@@ -13,6 +13,7 @@ import com.sip.book_shop.entities.Category;
 import com.sip.book_shop.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -30,16 +31,14 @@ public class BookApiService {
     @Autowired
     private BookMapper bookMapper;
 
-    public List<BookDTO> getAllResult(BookQueryCriteria criteria) {
+    public Page<BookDTO> getAllResult(BookQueryCriteria criteria) {
         Specification<Book> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Book> pageBooks = bookRepository.findAll(specification, criteria.getPageable());
 
-        List<BookDTO> responseBooks = new ArrayList<>();
-        for(Book book: pageBooks) {
-            responseBooks.add(bookMapper.toDto(book));
-        }
+        List<BookDTO> responseBooks = pageBooks.stream().map(bookMapper::toDto)
+                .toList();
 
-        return responseBooks;
+        return new PageImpl<>(responseBooks, pageBooks.getPageable(), pageBooks.getTotalElements());
     }
 
     public List<BookDTO> getAll() {

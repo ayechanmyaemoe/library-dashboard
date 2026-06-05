@@ -58,7 +58,7 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<UserDTO>>> findAll(NzDataTableInput dataTableInput) {
         UserQueryCriteria criteria = UserQueryCriteria.createUserQueryCriteria(dataTableInput);
-        DataTableOutput<UserDTO> dataTableOutput = DataTableOutput.of(userApiService.getAllResult(criteria), userApiService.count());
+        DataTableOutput<UserDTO> dataTableOutput = DataTableOutput.of(userApiService.getAllResult(criteria));
         return ResponseEntity.ok(ApiResponse.success(dataTableOutput));
     }
 

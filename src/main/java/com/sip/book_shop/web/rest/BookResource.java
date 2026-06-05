@@ -28,7 +28,7 @@ public class BookResource implements BaseResource<ApiResponse<DataTableOutput<Bo
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<BookDTO>>> findAll(NzDataTableInput dataTableInput) {
         BookQueryCriteria criteria = BookQueryCriteria.createBookQueryCriteria(dataTableInput);
-        DataTableOutput<BookDTO> dataTableOutput = DataTableOutput.of(bookApiService.getAllResult(criteria), bookApiService.count());
+        DataTableOutput<BookDTO> dataTableOutput = DataTableOutput.of(bookApiService.getAllResult(criteria));
         return ResponseEntity.ok(ApiResponse.success(dataTableOutput));
     }
 

@@ -29,7 +29,7 @@ public class CategoryResource implements BaseResource<ApiResponse<DataTableOutpu
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<CategoryDTO>>> findAll(NzDataTableInput dataTableInput) {
         CategoryQueryCriteria criteria = CategoryQueryCriteria.createCategoryQueryCriteria(dataTableInput);
-        DataTableOutput<CategoryDTO> dataTableOutput = DataTableOutput.of(categoryApiService.getAllResult(criteria), categoryApiService.count());
+        DataTableOutput<CategoryDTO> dataTableOutput = DataTableOutput.of(categoryApiService.getAllResult(criteria));
         return ResponseEntity.ok(ApiResponse.success(dataTableOutput));
     }
 

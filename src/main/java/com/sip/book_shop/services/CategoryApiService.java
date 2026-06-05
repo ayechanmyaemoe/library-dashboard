@@ -13,6 +13,7 @@ import com.sip.book_shop.repositories.BookRepository;
 import com.sip.book_shop.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -37,16 +38,14 @@ public class CategoryApiService {
     private CategoryMapper categoryMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public List<CategoryDTO> getAllResult(CategoryQueryCriteria criteria) {
+    public Page<CategoryDTO> getAllResult(CategoryQueryCriteria criteria) {
         Specification<Category> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Category> pageCategories = categoryRepository.findAll(specification, criteria.getPageable());
 
-        List<CategoryDTO> responseCategories = new ArrayList<>();
-        for(Category category: pageCategories) {
-            responseCategories.add(categoryMapper.toDto(category));
-        }
+        List<CategoryDTO> responseCategories = pageCategories.stream().map(categoryMapper::toDto)
+                .toList();
 
-        return responseCategories;
+        return new PageImpl<>(responseCategories, pageCategories.getPageable(), pageCategories.getTotalElements());
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

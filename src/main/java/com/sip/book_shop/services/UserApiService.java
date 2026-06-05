@@ -13,6 +13,7 @@ import com.sip.book_shop.entities.User;
 import com.sip.book_shop.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -62,16 +63,14 @@ public class UserApiService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public List<UserDTO> getAllResult(UserQueryCriteria criteria) {
+    public Page<UserDTO> getAllResult(UserQueryCriteria criteria) {
         Specification<User> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<User> pageUsers = userRepository.findAll(specification, criteria.getPageable());
 
-        List<UserDTO> responseRoles = new ArrayList<>();
-        for(User user: pageUsers) {
-            responseRoles.add(userMapper.toDto(user));
-        }
+        List<UserDTO> responseRoles = pageUsers.stream().map(userMapper::toDto)
+                .toList();
 
-        return responseRoles;
+        return new PageImpl<>(responseRoles, pageUsers.getPageable(), pageUsers.getTotalElements());
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

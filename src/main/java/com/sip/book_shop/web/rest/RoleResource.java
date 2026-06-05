@@ -28,7 +28,7 @@ public class RoleResource implements BaseResource<ApiResponse<DataTableOutput<Ro
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<RoleDTO>>> findAll(NzDataTableInput dataTableInput) {
         RoleQueryCriteria criteria = RoleQueryCriteria.createRoleQueryCriteria(dataTableInput);
-        DataTableOutput<RoleDTO> dataTableOutput = DataTableOutput.of(roleApiService.getAllResult(criteria), roleApiService.count());
+        DataTableOutput<RoleDTO> dataTableOutput = DataTableOutput.of(roleApiService.getAllResult(criteria));
         return ResponseEntity.ok(ApiResponse.success(dataTableOutput));
     }
 
