@@ -73,7 +73,7 @@ public class AuthorApiService {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void update(AuthorDTO request, int id) throws BindException {
         Author existingAuthor = getExistingAuthor(id);
-        if (!Objects.equals(existingAuthor.getName(), request.getName())) {
+        if (existingAuthor.getName().compareToIgnoreCase(request.getName()) != 0) {
             checkExistAuthor(request);
         }
         Author author = authorMapper.toEntity(request);

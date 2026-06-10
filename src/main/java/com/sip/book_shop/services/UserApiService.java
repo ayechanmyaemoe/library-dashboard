@@ -96,7 +96,7 @@ public class UserApiService {
     public void update(int id, UpdateUserRequest request) throws BindException {
         User updateUser = userMapper.toEntity(request);
         User existingUser = getExistingUser(id);
-        if(!Objects.equals(existingUser.getUsername(), updateUser.getUsername())) {
+        if(!Objects.equals(existingUser.getUsername().toLowerCase(), updateUser.getUsername().toLowerCase())) {
             checkUsername(request, "updateUserRequest", request.getUsername());
         } else if(!Objects.equals(existingUser.getEmail(), updateUser.getEmail())) {
             checkEmail(request, "updateUserRequest", request.getEmail());

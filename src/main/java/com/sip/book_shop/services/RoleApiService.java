@@ -76,7 +76,7 @@ public class RoleApiService {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void update(RoleDTO request, int id) throws BindException {
         Role existingRole = getExistingRole(id);
-        if(!Objects.equals(existingRole.getName(), request.getName().toUpperCase().trim())) {
+        if(existingRole.getName().compareToIgnoreCase(request.getName().trim()) != 0) {
             checkRoleExists(request);
         }
         Role role = roleMapper.toEntity(request);

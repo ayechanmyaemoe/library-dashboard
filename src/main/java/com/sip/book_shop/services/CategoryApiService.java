@@ -37,7 +37,7 @@ public class CategoryApiService {
     @Autowired
     private CategoryMapper categoryMapper;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<CategoryDTO> getAllResult(CategoryQueryCriteria criteria) {
         Specification<Category> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Category> pageCategories = categoryRepository.findAll(specification, criteria.getPageable());
@@ -77,7 +77,7 @@ public class CategoryApiService {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void update(CategoryDTO request, int id) throws BindException {
         Category existingCategory = getExistingCategory(id);
-        if(!Objects.equals(request.getName().toLowerCase(), existingCategory.getName().toLowerCase())) {
+        if(request.getName().compareToIgnoreCase(existingCategory.getName()) != 0) {
             checkExistCategory(request);
         }
         Category category = categoryMapper.toEntity(request);

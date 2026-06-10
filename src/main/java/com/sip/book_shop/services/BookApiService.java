@@ -69,7 +69,7 @@ public class BookApiService {
     public void update(BookInfoRequest request, int id) {
         Book existingBook = getExistingBook(id);
         Book updateBook = bookMapper.toEntity(request);
-        if(!Objects.equals(existingBook.getTitle(), updateBook.getTitle())) {
+        if(existingBook.getTitle().compareToIgnoreCase(updateBook.getTitle()) != 0) {
             checkExistBook(updateBook.getTitle(), updateBook.getAuthor(), updateBook.getCategory(), updateBook.publishedYear);
         }
         updateBook.setId(existingBook.getId());
