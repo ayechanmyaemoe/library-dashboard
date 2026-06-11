@@ -4,6 +4,7 @@ import com.sip.book_shop.common.utils.ObjectUtils;
 import com.sip.book_shop.repositories.UserRepository;
 import com.sip.book_shop.security.authentication.userdetail.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -26,22 +27,61 @@ public class AuthProvider {
     @Value("${jwt.secret}")
     private String SECRET;
 
+    @Value("${jwt.access_token.expire}")
+    private long ACCESS_TOKEN_EXPIRE;
+
+    @Value("${jwt.refresh_token.expire}")
+    private long REFRESH_TOKEN_EXPIRE;
+
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
-    public String generateToken(Authentication authentication) {
-        String principal = ObjectUtils.serializeToJson(authentication.getPrincipal());
+    public String generateAccessToken(Authentication authentication) {
+        return generateToken(authentication, ACCESS_TOKEN_EXPIRE);
+    }
 
+    public String generateRefreshToken(Authentication authentication) {
+        return generateToken(authentication, REFRESH_TOKEN_EXPIRE);
+    }
+
+    public String generateAccessTokenFromUserDetails(UserDetails userDetails) {
+        String principal = ObjectUtils.serializeToJson(userDetails);
         Map<String, Object> claims = new HashMap<>();
         claims.put("principal", principal);
+        return buildToken(claims, userDetails.getUsername(), ACCESS_TOKEN_EXPIRE);
+    }
 
+    public String generateToken(Authentication authentication, long expiration) {
+        String principal = ObjectUtils.serializeToJson(authentication.getPrincipal());
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("principal", principal);
+        return buildToken(claims, authentication.getName(), expiration);
+    }
+
+    private String buildToken(
+            Map<String, Object> claims,
+            String username,
+            long expiration
+    ) {
         return Jwts.builder()
                 .addClaims(claims)
-                .setSubject(authentication.getName())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public UserDetails getPrincipalFromToken(String token) {

@@ -42,8 +42,8 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Map<String, String>>> login(@Valid @RequestBody LoginRequest request) {
+    @PostMapping("/auth/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@Valid @RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -52,6 +52,16 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
             return ResponseEntity.ok(ApiResponse.success("logged in successfully!", tokenData));
         } catch (BadCredentialsException | UsernameNotFoundException e) {
             throw new BadCredentialsException("Invalid username or password!");
+        }
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        try {
+            var tokenData = userApiService.refreshToken(request.getRefreshToken());
+            return ResponseEntity.ok(ApiResponse.success("refreshed token successfully!", tokenData));
+        } catch (RuntimeException e) {
+            throw new BadCredentialsException(e.getMessage());
         }
     }
 

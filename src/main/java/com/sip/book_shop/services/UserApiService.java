@@ -6,7 +6,6 @@ import com.sip.book_shop.dto.mapper.UserMapper;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
 import com.sip.book_shop.security.authentication.AuthProvider;
 import com.sip.book_shop.vo.*;
-import com.sip.book_shop.common.exceptions.MisMatchException;
 import com.sip.book_shop.common.exceptions.NotAllowedException;
 import com.sip.book_shop.common.exceptions.NotFoundException;
 import com.sip.book_shop.entities.User;
@@ -15,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +37,7 @@ public class UserApiService {
     private UserRepository userRepository;
 
     @Autowired
-    private AuthProvider jwtService;
+    private AuthProvider authProvider;
 
     @Autowired
     private UserMapper userMapper;
@@ -55,11 +56,20 @@ public class UserApiService {
         userRepository.save(user);
     }
 
-    public Map<String, String> getLoginData(Authentication authentication) {
-        String token = jwtService.generateToken(authentication);
-        Map<String, String> tokenData = new HashMap<>();
-        tokenData.put("token", token);
-        return tokenData;
+    public Map<String, Object> getLoginData(Authentication authentication) {
+        String accessToken = authProvider.generateAccessToken(authentication);
+        String refreshToken = authProvider.generateRefreshToken(authentication);
+        return buildAuthResponse(accessToken, refreshToken);
+    }
+
+    public Map<String, Object> refreshToken(String refreshToken) {
+        if (!authProvider.validateToken(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired or invalid.");
+        }
+
+        UserDetails userDetails = authProvider.getPrincipalFromToken(refreshToken);
+        String newAccessToken = authProvider.generateAccessTokenFromUserDetails(userDetails);
+        return buildAuthResponse(newAccessToken, refreshToken);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -170,6 +180,25 @@ public class UserApiService {
             bindingResult.rejectValue("email", "duplicate", "Email already existed!");
             throw new BindException(bindingResult);
         }
+    }
+
+    public Map<String, Object> buildAuthResponse(String accessToken, String refreshToken) {
+        Map<String, Object> loginData = new LinkedHashMap<>();
+        loginData.put("accessToken", accessToken);
+        loginData.put("refreshToken", refreshToken);
+        UserDetails userDetails = authProvider.getPrincipalFromToken(refreshToken);
+
+        Map<String, Object> userProfile = new LinkedHashMap<>();
+        userProfile.put("username", userDetails.getUsername());
+
+        List<String> userRolesList = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        userProfile.put("userRoles", userRolesList);
+        loginData.put("user", userProfile);
+
+        return loginData;
     }
 
 }
