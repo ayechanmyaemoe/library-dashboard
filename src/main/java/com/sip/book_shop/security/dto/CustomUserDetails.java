@@ -1,4 +1,4 @@
-package com.sip.book_shop.security.authentication.userdetail;
+package com.sip.book_shop.security.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sip.book_shop.security.constant.AuthConstant;
@@ -14,11 +14,11 @@ import java.util.Collections;
 
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"password", "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
-public class UserDetailsImpl implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private User user;
 
-    public UserDetailsImpl(User user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 

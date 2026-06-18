@@ -11,6 +11,7 @@ import com.sip.book_shop.entities.Book;
 import com.sip.book_shop.entities.Category;
 import com.sip.book_shop.repositories.BookRepository;
 import com.sip.book_shop.repositories.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,18 +27,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryApiService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+    private final BookRepository bookRepository;
+    private final CategoryMapper categoryMapper;
 
-    @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private CategoryMapper categoryMapper;
-
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<CategoryDTO> getAllResult(CategoryQueryCriteria criteria) {
         Specification<Category> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Category> pageCategories = categoryRepository.findAll(specification, criteria.getPageable());
@@ -56,10 +52,6 @@ public class CategoryApiService {
             categoryDTOs.add(categoryMapper.toDto(category));
         }
         return categoryDTOs;
-    }
-
-    public long count() {
-        return categoryRepository.count();
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

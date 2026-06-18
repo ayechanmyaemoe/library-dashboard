@@ -8,6 +8,7 @@ import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.AuthorApiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/authors")
 public class AuthorResource implements BaseResource<ApiResponse<DataTableOutput<AuthorDTO>>, ApiResponse<AuthorDTO>, AuthorDTO, AuthorDTO> {
 
-    @Autowired
-    private AuthorApiService authorApiService;
+    private final AuthorApiService authorApiService;
 
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<AuthorDTO>>> findAll(NzDataTableInput dataTableInput) {

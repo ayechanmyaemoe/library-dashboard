@@ -8,6 +8,7 @@ import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.CategoryApiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,11 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/categories")
 public class CategoryResource implements BaseResource<ApiResponse<DataTableOutput<CategoryDTO>>, ApiResponse<CategoryDTO>, CategoryDTO, CategoryDTO> {
 
-    @Autowired
-    private CategoryApiService categoryApiService;
+    private final CategoryApiService categoryApiService;
 
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<CategoryDTO>>> findAll(NzDataTableInput dataTableInput) {

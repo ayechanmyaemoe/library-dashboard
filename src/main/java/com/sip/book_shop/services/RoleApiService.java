@@ -11,6 +11,7 @@ import com.sip.book_shop.entities.Role;
 import com.sip.book_shop.entities.User;
 import com.sip.book_shop.repositories.RoleRepository;
 import com.sip.book_shop.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,16 +26,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class RoleApiService {
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleMapper roleMapper;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleMapper roleMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<RoleDTO> getAllResult(RoleQueryCriteria criteria) {
@@ -55,10 +52,6 @@ public class RoleApiService {
             roleDTOs.add(roleMapper.toDto(role));
         }
         return roleDTOs;
-    }
-
-    public long count() {
-        return roleRepository.count();
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

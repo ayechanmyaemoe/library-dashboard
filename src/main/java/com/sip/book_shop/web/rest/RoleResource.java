@@ -8,6 +8,7 @@ import com.sip.book_shop.vo.ApiResponse;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.RoleApiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/roles")
 public class RoleResource implements BaseResource<ApiResponse<DataTableOutput<RoleDTO>>, ApiResponse<RoleDTO>, RoleDTO, RoleDTO> {
 
-    @Autowired
-    private RoleApiService roleApiService;
+    private final RoleApiService roleApiService;
 
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<RoleDTO>>> findAll(NzDataTableInput dataTableInput) {

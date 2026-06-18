@@ -7,6 +7,7 @@ import com.sip.book_shop.entities.Role;
 import com.sip.book_shop.repositories.AuthorRepository;
 import com.sip.book_shop.repositories.CategoryRepository;
 import com.sip.book_shop.repositories.RoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,16 +15,12 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Component
+@RequiredArgsConstructor
 public class MappingHelper {
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private AuthorRepository authorRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final RoleRepository roleRepository;
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
 
     @Named("trimString")
     public String trimString(String value) {

@@ -4,11 +4,13 @@ import com.sip.book_shop.common.excel.ExcelGenerator;
 import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.dto.UserDTO;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
+import com.sip.book_shop.security.dto.AuthenticationInfo;
 import com.sip.book_shop.vo.*;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.UserApiService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,14 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserResource implements BaseResource<ApiResponse<DataTableOutput<UserDTO>>, ApiResponse<UserDTO>, AddUserRequest, UpdateUserRequest> {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserApiService userApiService;
+    private final AuthenticationManager authenticationManager;
+    private final UserApiService userApiService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterUserRequest request) throws BindException {
@@ -43,7 +43,7 @@ public class UserResource implements BaseResource<ApiResponse<DataTableOutput<Us
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthenticationInfo>> login(@Valid @RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

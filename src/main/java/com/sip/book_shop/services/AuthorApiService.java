@@ -11,6 +11,7 @@ import com.sip.book_shop.entities.Author;
 import com.sip.book_shop.entities.Book;
 import com.sip.book_shop.repositories.AuthorRepository;
 import com.sip.book_shop.repositories.BookRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,16 +26,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class AuthorApiService {
 
-    @Autowired
-    private AuthorRepository authorRepository;
-
-    @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private AuthorMapper authorMapper;
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+    private final AuthorMapper authorMapper;
 
     public Page<AuthorDTO> findAll(AuthorQueryCriteria criteria) {
         Specification<Author> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
@@ -53,10 +50,6 @@ public class AuthorApiService {
             authorDTOs.add(authorMapper.toDto(author));
         }
         return authorDTOs;
-    }
-
-    public long count() {
-        return authorRepository.count();
     }
 
     public AuthorDTO findById(int id) {

@@ -1,4 +1,4 @@
-package com.sip.book_shop.security;
+package com.sip.book_shop.security.config;
 
 import com.sip.book_shop.vo.ApiResponse;
 import jakarta.servlet.ServletException;

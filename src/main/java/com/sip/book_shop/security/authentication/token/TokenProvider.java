@@ -1,40 +1,48 @@
-package com.sip.book_shop.security.authentication;
+package com.sip.book_shop.security.authentication.token;
 
 import com.sip.book_shop.common.utils.ObjectUtils;
-import com.sip.book_shop.repositories.UserRepository;
-import com.sip.book_shop.security.authentication.userdetail.UserDetailsServiceImpl;
+import com.sip.book_shop.security.dto.CustomUserDetails;
+import com.sip.book_shop.security.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Component
-public class AuthProvider {
+@RequiredArgsConstructor
+public class TokenProvider {
 
     @Value("${jwt.secret}")
     private String SECRET;
 
-    @Value("${jwt.access_token.expire}")
+    @Value("${jwt.token.access.expire-time}")
     private long ACCESS_TOKEN_EXPIRE;
 
-    @Value("${jwt.refresh_token.expire}")
+    @Value("${jwt.token.refresh.expire-time}")
     private long REFRESH_TOKEN_EXPIRE;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public TokenResponse createToken(Authentication authentication) {
+        String accessToken = generateAccessToken(authentication);
+        String refreshToken = generateRefreshToken(authentication);
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 
     public String generateAccessToken(Authentication authentication) {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE);
@@ -58,40 +66,34 @@ public class AuthProvider {
         return buildToken(claims, authentication.getName(), expiration);
     }
 
-    private String buildToken(
-            Map<String, Object> claims,
-            String username,
-            long expiration
-    ) {
+    private String buildToken(Map<String, Object> claims, String username, long expirationInMinutes) {
+        long expirationInMillis = TimeUnit.MINUTES.toMillis(expirationInMinutes);
         return Jwts.builder()
                 .addClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationInMillis))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateJwtToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getKey())
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
             return true;
-        } catch (Exception ex) {
+        } catch (ExpiredJwtException ex) {
             return false;
         }
     }
 
-    public UserDetails getPrincipalFromToken(String token) {
+    public CustomUserDetails getPrincipalFromToken(String token) {
         Claims claims = extractAllClaims(token);
         String principal = claims.get("principal", String.class);
         if (principal == null) {
             throw new IllegalArgumentException("Invalid token: Principal data is missing.");
         }
 
-        return userDetailsServiceImpl.loadUserByUsername(claims.getSubject());
+        return customUserDetailsService.loadUserByUsername(claims.getSubject());
     }
 
     private Key getKey() {

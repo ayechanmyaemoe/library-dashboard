@@ -9,6 +9,7 @@ import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
 import com.sip.book_shop.services.BookApiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/books")
 public class BookResource implements BaseResource<ApiResponse<DataTableOutput<BookDTO>>, ApiResponse<BookDTO>, BookInfoRequest, BookInfoRequest> {
 
-    @Autowired
-    private BookApiService bookApiService;
+    private final BookApiService bookApiService;
 
     @Override
     public ResponseEntity<ApiResponse<DataTableOutput<BookDTO>>> findAll(NzDataTableInput dataTableInput) {

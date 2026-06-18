@@ -4,17 +4,19 @@ import com.sip.book_shop.common.query.QueryHelper;
 import com.sip.book_shop.dto.UserDTO;
 import com.sip.book_shop.dto.mapper.UserMapper;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
-import com.sip.book_shop.security.authentication.AuthProvider;
+import com.sip.book_shop.security.authentication.token.TokenProvider;
+import com.sip.book_shop.security.authentication.token.TokenResponse;
+import com.sip.book_shop.security.dto.AuthenticationInfo;
+import com.sip.book_shop.security.dto.CustomUserDetails;
 import com.sip.book_shop.vo.*;
 import com.sip.book_shop.common.exceptions.NotAllowedException;
 import com.sip.book_shop.common.exceptions.NotFoundException;
 import com.sip.book_shop.entities.User;
 import com.sip.book_shop.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,19 +30,13 @@ import org.springframework.validation.BindException;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserApiService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AuthProvider authProvider;
-
-    @Autowired
-    private UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
+    private final UserMapper userMapper;
 
     public void register(RegisterUserRequest request) throws BindException {
         User user = userMapper.toEntity(request);
@@ -56,20 +52,19 @@ public class UserApiService {
         userRepository.save(user);
     }
 
-    public Map<String, Object> getLoginData(Authentication authentication) {
-        String accessToken = authProvider.generateAccessToken(authentication);
-        String refreshToken = authProvider.generateRefreshToken(authentication);
-        return buildAuthResponse(accessToken, refreshToken);
+    public AuthenticationInfo getLoginData(Authentication authentication) {
+        TokenResponse tokenResponse = tokenProvider.createToken(authentication);
+        return buildAuthenticationInfo(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
     }
 
-    public Map<String, Object> refreshToken(String refreshToken) {
-        if (!authProvider.validateToken(refreshToken)) {
+    public AuthenticationInfo refreshToken(String refreshToken) {
+        if (!tokenProvider.validateJwtToken(refreshToken)) {
             throw new RuntimeException("Refresh token is expired or invalid.");
         }
 
-        UserDetails userDetails = authProvider.getPrincipalFromToken(refreshToken);
-        String newAccessToken = authProvider.generateAccessTokenFromUserDetails(userDetails);
-        return buildAuthResponse(newAccessToken, refreshToken);
+        UserDetails userDetails = tokenProvider.getPrincipalFromToken(refreshToken);
+        String newAccessToken = tokenProvider.generateAccessTokenFromUserDetails(userDetails);
+        return buildAuthenticationInfo(newAccessToken, refreshToken);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -91,10 +86,6 @@ public class UserApiService {
             userDTOs.add(userMapper.toDto(user));
         }
         return userDTOs;
-    }
-
-    public long count() {
-        return userRepository.count();
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -182,23 +173,14 @@ public class UserApiService {
         }
     }
 
-    public Map<String, Object> buildAuthResponse(String accessToken, String refreshToken) {
-        Map<String, Object> loginData = new LinkedHashMap<>();
-        loginData.put("accessToken", accessToken);
-        loginData.put("refreshToken", refreshToken);
-        UserDetails userDetails = authProvider.getPrincipalFromToken(refreshToken);
-
-        Map<String, Object> userProfile = new LinkedHashMap<>();
-        userProfile.put("username", userDetails.getUsername());
-
-        List<String> userRolesList = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        userProfile.put("userRoles", userRolesList);
-        loginData.put("user", userProfile);
-
-        return loginData;
+    public AuthenticationInfo buildAuthenticationInfo(String accessToken, String refreshToken) {
+        CustomUserDetails userDetails = tokenProvider.getPrincipalFromToken(refreshToken);
+        return AuthenticationInfo.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .user(UserDTO.builder().username(userDetails.getUsername()).email(userDetails.getEmail()).build())
+                .grantedAuthorities(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .build();
     }
 
 }
