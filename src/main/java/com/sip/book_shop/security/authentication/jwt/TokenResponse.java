@@ -1,21 +1,16 @@
-package com.sip.book_shop.security.dto;
+package com.sip.book_shop.security.authentication.jwt;
 
-import com.sip.book_shop.web.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationInfo {
+public class TokenResponse {
 
     private String accessToken;
     private String refreshToken;
-    private UserDTO user;
-    private List<String> grantedAuthorities;
 }

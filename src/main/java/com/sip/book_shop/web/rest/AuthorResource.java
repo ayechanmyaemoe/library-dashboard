@@ -1,15 +1,14 @@
 package com.sip.book_shop.web.rest;
 
-import com.sip.book_shop.common.excel.ExcelGenerator;
-import com.sip.book_shop.dto.AuthorDTO;
+import com.sip.book_shop.common.excel.service.ExcelGenerator;
+import com.sip.book_shop.web.dto.AuthorDTO;
 import com.sip.book_shop.entities.queryCriteria.AuthorQueryCriteria;
 import com.sip.book_shop.vo.ApiResponse;
 import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
-import com.sip.book_shop.services.AuthorApiService;
+import com.sip.book_shop.service.AuthorApiService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

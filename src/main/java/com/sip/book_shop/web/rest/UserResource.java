@@ -1,17 +1,16 @@
 package com.sip.book_shop.web.rest;
 
-import com.sip.book_shop.common.excel.ExcelGenerator;
+import com.sip.book_shop.common.excel.service.ExcelGenerator;
 import com.sip.book_shop.common.vo.NzDataTableInput;
-import com.sip.book_shop.dto.UserDTO;
+import com.sip.book_shop.web.dto.UserDTO;
 import com.sip.book_shop.entities.queryCriteria.UserQueryCriteria;
 import com.sip.book_shop.security.dto.AuthenticationInfo;
 import com.sip.book_shop.vo.*;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
-import com.sip.book_shop.services.UserApiService;
+import com.sip.book_shop.service.UserApiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +24,6 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

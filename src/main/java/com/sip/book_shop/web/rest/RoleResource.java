@@ -1,15 +1,14 @@
 package com.sip.book_shop.web.rest;
 
-import com.sip.book_shop.common.excel.ExcelGenerator;
-import com.sip.book_shop.dto.RoleDTO;
+import com.sip.book_shop.common.excel.service.ExcelGenerator;
+import com.sip.book_shop.web.dto.RoleDTO;
 import com.sip.book_shop.entities.queryCriteria.RoleQueryCriteria;
 import com.sip.book_shop.common.vo.NzDataTableInput;
 import com.sip.book_shop.vo.ApiResponse;
 import com.sip.book_shop.common.vo.DataTableOutput;
 import com.sip.book_shop.web.rest.base.BaseResource;
-import com.sip.book_shop.services.RoleApiService;
+import com.sip.book_shop.service.RoleApiService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

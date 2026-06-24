@@ -1,0 +1,90 @@
+package com.sip.book_shop.service;
+
+import com.sip.book_shop.common.query.utils.QueryHelper;
+import com.sip.book_shop.web.dto.BookDTO;
+import com.sip.book_shop.web.dto.mapper.BookMapper;
+import com.sip.book_shop.entities.queryCriteria.BookQueryCriteria;
+import com.sip.book_shop.vo.BookInfoRequest;
+import com.sip.book_shop.common.exception.AlreadyExistsException;
+import com.sip.book_shop.common.exception.NotFoundException;
+import com.sip.book_shop.entities.Author;
+import com.sip.book_shop.entities.Book;
+import com.sip.book_shop.entities.Category;
+import com.sip.book_shop.repositories.BookRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class BookApiService {
+
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
+
+    public Page<BookDTO> getAllResult(BookQueryCriteria criteria) {
+        Specification<Book> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
+        Page<Book> pageBooks = bookRepository.findAll(specification, criteria.getPageable());
+
+        List<BookDTO> responseBooks = pageBooks.stream().map(bookMapper::toDto)
+                .toList();
+
+        return new PageImpl<>(responseBooks, pageBooks.getPageable(), pageBooks.getTotalElements());
+    }
+
+    public List<BookDTO> getAll() {
+        List<BookDTO> bookDTOs = new ArrayList<>();
+        List<Book> books = bookRepository.findAll();
+        for(Book book: books) {
+            bookDTOs.add(bookMapper.toDto(book));
+        }
+        return bookDTOs;
+    }
+
+    public BookDTO findById(int id) {
+        return bookMapper.toDto(getExistingBook(id));
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void addNew(BookInfoRequest request) {
+        Book book = bookMapper.toEntity(request);
+        checkExistBook(book.getTitle(), book.getAuthor(), book.getCategory(), book.publishedYear);
+        bookRepository.save(book);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void update(BookInfoRequest request, int id) {
+        Book existingBook = getExistingBook(id);
+        Book updateBook = bookMapper.toEntity(request);
+        if(existingBook.getTitle().compareToIgnoreCase(updateBook.getTitle()) != 0) {
+            checkExistBook(updateBook.getTitle(), updateBook.getAuthor(), updateBook.getCategory(), updateBook.publishedYear);
+        }
+        updateBook.setId(existingBook.getId());
+        bookRepository.save(updateBook);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void delete(int id) {
+        Book existingBook = getExistingBook(id);
+        bookRepository.deleteById(existingBook.getId());
+    }
+
+    private void checkExistBook(String title, Author author, Category category, int publishedYear) {
+        var book = bookRepository.findByTitleAndAuthorAndCategoryAndPublishedYear(
+                title, author, category, publishedYear);
+        if(book.isPresent()) {
+            throw new AlreadyExistsException("Book already existed!");
+        }
+    }
+
+    private Book getExistingBook(int id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("There is no book with such id."));
+    }
+}
