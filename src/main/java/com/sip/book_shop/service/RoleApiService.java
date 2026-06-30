@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 
@@ -30,6 +31,7 @@ public class RoleApiService {
     private final UserRepository userRepository;
     private final RoleMapper roleMapper;
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<RoleDTO> getAllResult(RoleQueryCriteria criteria) {
         Specification<Role> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
@@ -41,6 +43,7 @@ public class RoleApiService {
         return new PageImpl<>(responseRoles, pageBooks.getPageable(), pageBooks.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<RoleDTO> getAll() {
         List<RoleDTO> roleDTOs = new ArrayList<>();
@@ -51,6 +54,7 @@ public class RoleApiService {
         return roleDTOs;
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public RoleDTO findById(int id) {
         return roleMapper.toDto(getExistingRole(id));

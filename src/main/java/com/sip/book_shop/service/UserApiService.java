@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 
@@ -67,6 +68,7 @@ public class UserApiService {
         return buildAuthenticationInfo(newAccessToken, refreshToken);
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<UserDTO> getAllResult(UserQueryCriteria criteria) {
         Specification<User> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
@@ -78,6 +80,7 @@ public class UserApiService {
         return new PageImpl<>(responseRoles, pageUsers.getPageable(), pageUsers.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<UserDTO> getAll() {
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -88,6 +91,7 @@ public class UserApiService {
         return userDTOs;
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public UserDTO findById(int id) {
         return userMapper.toDto(getExistingUser(id));

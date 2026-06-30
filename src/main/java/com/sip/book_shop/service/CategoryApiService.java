@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 
@@ -30,6 +31,7 @@ public class CategoryApiService {
     private final BookRepository bookRepository;
     private final CategoryMapper categoryMapper;
 
+    @Transactional(readOnly = true)
     public Page<CategoryDTO> getAllResult(CategoryQueryCriteria criteria) {
         Specification<Category> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Category> pageCategories = categoryRepository.findAll(specification, criteria.getPageable());
@@ -40,6 +42,7 @@ public class CategoryApiService {
         return new PageImpl<>(responseCategories, pageCategories.getPageable(), pageCategories.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<CategoryDTO> getAll() {
         List<CategoryDTO> categoryDTOs = new ArrayList<>();
@@ -50,6 +53,7 @@ public class CategoryApiService {
         return categoryDTOs;
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public CategoryDTO findById(int id) {
         return categoryMapper.toDto(getExistingCategory(id));

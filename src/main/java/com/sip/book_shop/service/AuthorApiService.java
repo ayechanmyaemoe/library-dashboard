@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 
@@ -30,6 +31,7 @@ public class AuthorApiService {
     private final BookRepository bookRepository;
     private final AuthorMapper authorMapper;
 
+    @Transactional(readOnly = true)
     public Page<AuthorDTO> findAll(AuthorQueryCriteria criteria) {
         Specification<Author> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Author> pageAuthors = authorRepository.findAll(specification, criteria.getPageable());
@@ -40,6 +42,7 @@ public class AuthorApiService {
         return new PageImpl<>(responseAuthors, pageAuthors.getPageable(), pageAuthors.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public List<AuthorDTO> getAll() {
         List<AuthorDTO> authorDTOs = new ArrayList<>();
         List<Author> authors = authorRepository.findAll();
@@ -49,6 +52,7 @@ public class AuthorApiService {
         return authorDTOs;
     }
 
+    @Transactional(readOnly = true)
     public AuthorDTO findById(int id) {
         return authorMapper.toDto(getExistingAuthor(id));
     }

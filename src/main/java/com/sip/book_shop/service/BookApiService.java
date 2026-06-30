@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class BookApiService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
+    @Transactional(readOnly = true)
     public Page<BookDTO> getAllResult(BookQueryCriteria criteria) {
         Specification<Book> specification = (root, cq, cb) -> QueryHelper.getPredicate(root, criteria, cq, cb);
         Page<Book> pageBooks = bookRepository.findAll(specification, criteria.getPageable());
@@ -38,6 +40,7 @@ public class BookApiService {
         return new PageImpl<>(responseBooks, pageBooks.getPageable(), pageBooks.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public List<BookDTO> getAll() {
         List<BookDTO> bookDTOs = new ArrayList<>();
         List<Book> books = bookRepository.findAll();
@@ -47,6 +50,7 @@ public class BookApiService {
         return bookDTOs;
     }
 
+    @Transactional(readOnly = true)
     public BookDTO findById(int id) {
         return bookMapper.toDto(getExistingBook(id));
     }
